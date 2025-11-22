@@ -1,4 +1,4 @@
-import { Pillar, Execution } from './types';
+import { Pillar, Execution, UserSettings } from './types';
 
 export const INITIAL_PILLARS: Pillar[] = [
   {
@@ -7,6 +7,7 @@ export const INITIAL_PILLARS: Pillar[] = [
     coreIdea: 'Deep work is impossible in a world of constant pings. We need to move to document-driven cultures where meetings are the last resort, not the first.',
     topic: 'Productivity',
     status: 'active',
+    themes: ['Deep Work', 'Async First'],
   },
   {
     id: 'p2',
@@ -14,6 +15,7 @@ export const INITIAL_PILLARS: Pillar[] = [
     coreIdea: 'Generative AI should be treated as a junior developer or intern. It needs guidance, context, and review. Handing over the keys entirely is a mistake.',
     topic: 'Technology',
     status: 'active',
+    themes: ['Human in the Loop', 'AI Reality Check'],
   },
   {
     id: 'p3',
@@ -21,6 +23,7 @@ export const INITIAL_PILLARS: Pillar[] = [
     coreIdea: 'Startups often skip design systems to move fast, but this creates debt. A minimal viable design system (MVDS) is crucial even at seed stage.',
     topic: 'Design',
     status: 'active',
+    themes: ['Scalability', 'Systems Thinking'],
   },
   {
     id: 'p4',
@@ -28,6 +31,7 @@ export const INITIAL_PILLARS: Pillar[] = [
     coreIdea: 'Vanity metrics (downloads, views) kill companies. Focus on retention cohorts and net dollar retention from day one.',
     topic: 'Business',
     status: 'active',
+    themes: ['Systems Thinking', 'Anti-Vanity'],
   }
 ];
 
@@ -66,4 +70,31 @@ export const PLATFORM_CONFIG = {
   instagram: { color: 'text-pink-500', label: 'Instagram', maxChars: 2200 },
   newsletter: { color: 'text-orange-400', label: 'Newsletter', maxChars: null },
   youtube: { color: 'text-red-500', label: 'YouTube Script', maxChars: null },
+};
+
+export const DEFAULT_SETTINGS: UserSettings = {
+  model: 'gemini-2.5-flash',
+  globalVoice: "Professional, insightful, and concise. Avoid corporate jargon. Write like a human talking to a smart peer. Be opinionated but backed by logic.",
+  platforms: {
+    twitter: {
+      customPrompt: "Short, punchy. No hashtags unless necessary. Use threads for complex ideas. One main point per tweet.",
+      writingSamples: ""
+    },
+    linkedin: {
+      customPrompt: "Professional but conversational. Use line breaks for readability. Start with a strong hook/opinion. End with a question to drive engagement.",
+      writingSamples: ""
+    },
+    instagram: {
+      customPrompt: "Visual-first caption. Use a friendly, behind-the-scenes tone. Include relevant emojis.",
+      writingSamples: ""
+    },
+    newsletter: {
+      customPrompt: "Personal letter format. Subject line included. Deep dive into the topic. Use subheaders.",
+      writingSamples: ""
+    },
+    youtube: {
+      customPrompt: "Video script format. Include: [HOOK], [INTRO], [BODY], [CALL TO ACTION]. Casual, spoken tone.",
+      writingSamples: ""
+    }
+  }
 };

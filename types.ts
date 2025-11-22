@@ -6,6 +6,7 @@ export interface Pillar {
   coreIdea: string;
   topic: string;
   status: 'active' | 'archived';
+  themes?: string[]; // "Red threads" or cross-cutting themes
 }
 
 export interface Execution {
@@ -27,4 +28,16 @@ export interface AIExecutionSuggestion {
   platform: Platform;
   content: string;
   reasoning: string;
+}
+
+// Settings
+export interface PlatformSettings {
+  customPrompt: string;
+  writingSamples: string;
+}
+
+export interface UserSettings {
+  model: string;
+  globalVoice: string;
+  platforms: Record<Platform, PlatformSettings>;
 }

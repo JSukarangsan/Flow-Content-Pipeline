@@ -7,11 +7,42 @@ import { generateExecutions, generatePillarIdeas, refineCopy, analyzeThemes } fr
 
 function App() {
   // --- State ---
-  const [pillars, setPillars] = useState<Pillar[]>(INITIAL_PILLARS);
-  const [executions, setExecutions] = useState<Execution[]>(INITIAL_EXECUTIONS);
+  const [pillars, setPillars] = useState<Pillar[]>(() => {
+    const saved = localStorage.getItem('flow_pillars');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return INITIAL_PILLARS;
+      }
+    }
+    return INITIAL_PILLARS;
+  });
+  const [executions, setExecutions] = useState<Execution[]>(() => {
+    const saved = localStorage.getItem('flow_executions');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return INITIAL_EXECUTIONS;
+      }
+    }
+    return INITIAL_EXECUTIONS;
+  });
   
   // Selection State
-  const [selectedPillarId, setSelectedPillarId] = useState<string | null>(INITIAL_PILLARS[0]?.id || null);
+  const [selectedPillarId, setSelectedPillarId] = useState<string | null>(() => {
+    const saved = localStorage.getItem('flow_pillars');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed[0]?.id || null;
+      } catch {
+        return INITIAL_PILLARS[0]?.id || null;
+      }
+    }
+    return INITIAL_PILLARS[0]?.id || null;
+  });
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
   
   // UI State
@@ -54,6 +85,16 @@ function App() {
     setSettings(newSettings);
     localStorage.setItem('flow_settings', JSON.stringify(newSettings));
   };
+
+  // Persist pillars
+  useEffect(() => {
+    localStorage.setItem('flow_pillars', JSON.stringify(pillars));
+  }, [pillars]);
+
+  // Persist executions
+  useEffect(() => {
+    localStorage.setItem('flow_executions', JSON.stringify(executions));
+  }, [executions]);
 
   // --- Derived Data ---
   

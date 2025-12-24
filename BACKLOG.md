@@ -208,9 +208,9 @@ NEWSLETTER (Sunday)
 
 | Priority | Item | Notes | Status |
 |----------|------|-------|--------|
-| P1 | Add testing framework | Jest or Vitest | 🔲 |
-| P1 | Add ESLint + Prettier | Code quality | 🔲 |
-| P1 | Persist pillars/executions | Currently only settings saved to LocalStorage | 🔲 |
+| P1 | Add testing framework | Vitest + React Testing Library | ✅ |
+| P1 | Add ESLint + Prettier | Code quality | ✅ |
+| P1 | Persist pillars/executions | LocalStorage with lazy initialization | ✅ |
 | P2 | API key management UI | Secure input instead of env var | 🔲 |
 | P2 | Undo/Redo system | Editor history management | 🔲 |
 | P3 | Advanced search | Regex, date filters | 🔲 |

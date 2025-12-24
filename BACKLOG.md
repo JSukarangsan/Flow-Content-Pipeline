@@ -35,16 +35,21 @@ type Play = {
 }
 ```
 
-#### Starter Play Library
+#### V1.1 Play Library (3 Plays)
 
 | Play Name | Trigger | Inputs | Outputs |
 |-----------|---------|--------|---------|
 | **Pillar & Satellite** | Long-form blog/article | 1 pillar post | 5-7 LinkedIn posts, 3-5 tweet threads, 1 newsletter section |
-| **Controversy Cascade** | Hot take / contrarian opinion | 1 spicy opinion | Initial post → defense post → nuance post → "what I learned" post → newsletter deep-dive |
 | **Case Study Atomizer** | Client win / project completion | Case study details | Metrics post, lessons learned post, "how we did it" thread, testimonial ask template |
-| **Reverse Engineer** | Competitor or industry content | URL or paste | Your contrarian take, "yes and" expansion, application to your niche |
-| **Weekly Recap** | Week's activities/learnings | Quick bullet notes | "5 things I learned" post, thread version, newsletter intro |
 | **Question Flip** | FAQ you keep answering | Common question | Direct answer post, contrarian angle, "unpopular opinion" version |
+
+#### Future Plays (V2+)
+
+| Play Name | Trigger | Inputs | Outputs |
+|-----------|---------|--------|---------|
+| Controversy Cascade | Hot take / contrarian opinion | 1 spicy opinion | Initial post → defense post → nuance post → "what I learned" post → newsletter deep-dive |
+| Reverse Engineer | Competitor or industry content | URL or paste | Your contrarian take, "yes and" expansion, application to your niche |
+| Weekly Recap | Week's activities/learnings | Quick bullet notes | "5 things I learned" post, thread version, newsletter intro |
 
 #### Play Execution UI
 
@@ -83,39 +88,32 @@ An AI agent that sits on top of your content inventory, external inputs, and (op
 └─────────────────────────────────────────────────────────────┘
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  LAYER 2: EXTERNAL INPUTS (configurable sources)           │
+│  LAYER 2: EXTERNAL INPUTS (via MCP)                        │
 │  - Notion database (saved articles, research, ideas)       │
-│  - RSS feeds (industry news)                               │
-│  - Bookmarks/read-later queue                              │
-│  - Manual "spark" notes                                    │
 └─────────────────────────────────────────────────────────────┘
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  LAYER 3: PERFORMANCE SIGNALS (optional)                   │
-│  - Manual entry (engagement scores)                        │
-│  - CSV import from analytics                               │
-│  - Future: API connections to LinkedIn/Twitter             │
+│  LAYER 3: PERFORMANCE SIGNALS                              │
+│  - CSV import from LinkedIn analytics                      │
+│  - CSV import from Kit (newsletter) analytics              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-#### Performance Tracking Reality Check
+#### Performance Tracking (CSV Import)
 
-API options are messy:
+**Supported Platforms:**
 
-- **LinkedIn API** — requires partner approval, limited access for personal profiles
-- **Twitter/X API** — paid, rate-limited, constantly changing
-- **Manual is actually fine for V1** — most creators know what's working
+| Platform | Export Source | Key Metrics |
+|----------|---------------|-------------|
+| **LinkedIn** | Analytics → Export | Impressions, reactions, comments, shares, CTR |
+| **Kit** (newsletter) | Broadcasts → Export | Opens, clicks, unsubscribes, click rate |
 
-**Practical V1 approach:**
+**How it works:**
 
-1. Add a `performance_score` field to Executions (1-5 scale or Low/Med/High/Viral)
-2. User tags published content with rough performance after a few days
-3. Strategy Copilot weights recommendations based on what's worked
-
-**V2 enhancement:**
-
-- CSV import from native platform analytics exports
-- Notion database sync where user tracks performance in their existing system
+1. User exports CSV from LinkedIn or Kit dashboard
+2. Flow parses CSV and matches posts to Executions by date/content
+3. `performance_score` field auto-populated on Executions
+4. Strategy Copilot uses scores to weight recommendations
 
 #### Strategy Copilot Weekly Planning Flow
 
@@ -165,37 +163,42 @@ NEWSLETTER (Sunday)
 - "Generate Drafts" button creates actual content for each slot
 - Drafts land in the Editor for final polish
 
-#### Data Sources Integration (V1)
+#### Data Sources Integration (Notion via MCP)
 
-**Notion Integration:**
+**Why MCP:**
+- No custom OAuth integration needed
+- User configures Notion MCP server with their API key
+- Flow queries databases via MCP protocol
+- Clean separation of concerns
 
-Connect a Notion database with:
-- Title (article/idea name)
-- URL (source link)
-- Notes (your quick thoughts)
-- Tags (topic categories)
-- Status (unprocessed, used, archived)
+**Notion Database Schema:**
 
-Copilot pulls unprocessed items as potential content fuel.
+| Field | Type | Purpose |
+|-------|------|---------|
+| Title | Text | Article/idea name |
+| URL | URL | Source link |
+| Notes | Text | Quick thoughts |
+| Tags | Multi-select | Topic categories (maps to Pillars) |
+| Status | Select | `unprocessed` / `used` / `archived` |
 
-**Simple "Spark Box":**
-
-- Quick capture within Flow
-- Paste a link, jot a thought, tag a pillar
-- Copilot mines these during planning
+**Flow Integration:**
+1. User connects Notion MCP server in settings
+2. Selects which database to sync
+3. Copilot queries for `status = unprocessed` items
+4. After using an idea, Flow updates status to `used`
 
 ---
 
-## Open Questions
+## Decisions Made
 
-> Decisions needed before implementation
+> Resolved before implementation
 
-| # | Question | Options | Decision |
-|---|----------|---------|----------|
-| 1 | **Notion vs. built-in capture** | Flow's own idea capture vs. Notion sync as source of truth | TBD |
-| 2 | **Planning cadence** | Weekly plans only vs. also "generate one post now" quick mode | TBD |
-| 3 | **Performance tracking MVP** | Manual tagging (1-5) vs. CSV import from day one | TBD |
-| 4 | **Play library scope** | Start with 5-6 plays vs. more variety at launch | TBD |
+| # | Question | Decision |
+|---|----------|----------|
+| 1 | **Notion vs. built-in capture** | ✅ **Notion via MCP** — No built-in capture, Notion is the source of truth |
+| 2 | **Planning cadence** | ✅ **Weekly plans only** — Plays handle ad-hoc generation |
+| 3 | **Performance tracking MVP** | ✅ **CSV import** — LinkedIn + Kit (newsletter) from day one |
+| 4 | **Play library scope** | ✅ **3 plays** — Pillar & Satellite, Case Study Atomizer, Question Flip |
 
 ---
 

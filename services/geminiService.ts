@@ -1,19 +1,20 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AIExecutionSuggestion, Platform, UserSettings, Pillar } from '../types';
 
-// Initialize the client safely
-const getAiClient = () => {
-  const apiKey = process.env.API_KEY;
+// Initialize the client with user-provided API key
+const getAiClient = (settings: UserSettings) => {
+  // Try user-provided key first, fall back to env var
+  const apiKey = settings.apiKey || process.env.API_KEY;
   if (!apiKey) {
-    console.error("API_KEY is missing from environment");
+    console.error("API_KEY is not configured. Add it in Settings.");
     return null;
   }
   return new GoogleGenAI({ apiKey });
 };
 
 export const generatePillarIdeas = async (topic: string, settings: UserSettings): Promise<{ title: string; coreIdea: string }[]> => {
-  const ai = getAiClient();
-  if (!ai) throw new Error("API Key not configured");
+  const ai = getAiClient(settings);
+  if (!ai) throw new Error("API Key not configured. Add your Gemini API key in Settings.");
 
   const prompt = `Generate 3 contrarian or insightful content pillar ideas for the topic: "${topic}". 
   Avoid generic advice. Focus on strong opinions or specific methodologies.
@@ -50,8 +51,8 @@ export const generatePillarIdeas = async (topic: string, settings: UserSettings)
 };
 
 export const analyzeThemes = async (pillars: Pillar[], settings: UserSettings): Promise<{ pillarId: string; themes: string[] }[]> => {
-  const ai = getAiClient();
-  if (!ai) throw new Error("API Key not configured");
+  const ai = getAiClient(settings);
+  if (!ai) throw new Error("API Key not configured. Add your Gemini API key in Settings.");
 
   const pillarsInput = pillars.map(p => ({ id: p.id, title: p.title, coreIdea: p.coreIdea, topic: p.topic }));
 
@@ -98,13 +99,13 @@ export const analyzeThemes = async (pillars: Pillar[], settings: UserSettings): 
 };
 
 export const generateExecutions = async (
-  coreIdea: string, 
-  platforms: Platform[], 
+  coreIdea: string,
+  platforms: Platform[],
   instructions: string,
   settings: UserSettings
 ): Promise<AIExecutionSuggestion[]> => {
-  const ai = getAiClient();
-  if (!ai) throw new Error("API Key not configured");
+  const ai = getAiClient(settings);
+  if (!ai) throw new Error("API Key not configured. Add your Gemini API key in Settings.");
 
   const platformString = platforms.join(', ');
 
@@ -160,8 +161,8 @@ export const generateExecutions = async (
 };
 
 export const refineCopy = async (currentCopy: string, instructions: string, settings: UserSettings): Promise<string> => {
-  const ai = getAiClient();
-  if (!ai) throw new Error("API Key not configured");
+  const ai = getAiClient(settings);
+  if (!ai) throw new Error("API Key not configured. Add your Gemini API key in Settings.");
 
   const prompt = `You are an expert editor with this voice: "${settings.globalVoice}".
   

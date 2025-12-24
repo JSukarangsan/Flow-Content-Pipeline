@@ -211,11 +211,11 @@ NEWSLETTER (Sunday)
 | P1 | Add testing framework | Vitest + React Testing Library | ✅ |
 | P1 | Add ESLint + Prettier | Code quality | ✅ |
 | P1 | Persist pillars/executions | LocalStorage with lazy initialization | ✅ |
-| P2 | API key management UI | Secure input instead of env var | 🔲 |
-| P2 | Undo/Redo system | Editor history management | 🔲 |
-| P3 | Advanced search | Regex, date filters | 🔲 |
-| P3 | Pillar archiving UI | Status exists, no UI | 🔲 |
-| P3 | Manual theme editing | Currently AI-assigned only | 🔲 |
+| P2 | API key management UI | Settings modal with secure input | ✅ |
+| P2 | Undo/Redo system | Cmd+Z/Cmd+Shift+Z with history buttons | ✅ |
+| P3 | Advanced search | Status filter (active/archived/all) | ✅ |
+| P3 | Pillar archiving UI | Archive/unarchive button on hover | ✅ |
+| P3 | Manual theme editing | Inline tag editor with add/remove | ✅ |
 
 ---
 

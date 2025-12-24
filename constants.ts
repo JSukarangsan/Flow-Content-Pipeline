@@ -75,6 +75,7 @@ export const PLATFORM_CONFIG = {
 export const DEFAULT_SETTINGS: UserSettings = {
   model: 'gemini-2.5-flash',
   globalVoice: "Professional, insightful, and concise. Avoid corporate jargon. Write like a human talking to a smart peer. Be opinionated but backed by logic.",
+  apiKey: '',
   platforms: {
     twitter: {
       customPrompt: "Short, punchy. No hashtags unless necessary. Use threads for complex ideas. One main point per tweet.",

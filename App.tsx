@@ -50,8 +50,12 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterTopic, setFilterTopic] = useState<string | null>(null);
   const [filterTheme, setFilterTheme] = useState<string | null>(null);
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'archived'>('active');
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiMessage, setAiMessage] = useState('');
+
+  // Editor History (Undo/Redo)
+  const [editorHistory, setEditorHistory] = useState<{ past: string[]; future: string[] }>({ past: [], future: [] });
 
   // Settings State
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
@@ -102,12 +106,13 @@ function App() {
   const allThemes = Array.from(new Set(pillars.flatMap(p => p.themes || []).filter(Boolean))).sort();
 
   const filteredPillars = pillars.filter(p => {
-    const matchSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         p.coreIdea.toLowerCase().includes(searchTerm.toLowerCase());
     const matchTopic = filterTopic ? p.topic === filterTopic : true;
     const matchTheme = filterTheme ? p.themes?.includes(filterTheme) : true;
-    
-    return matchSearch && matchTopic && matchTheme;
+    const matchStatus = filterStatus === 'all' ? true : p.status === filterStatus;
+
+    return matchSearch && matchTopic && matchTheme && matchStatus;
   });
 
   const filteredExecutions = executions.filter(e => e.pillarId === selectedPillarId);
@@ -191,7 +196,16 @@ function App() {
       e.preventDefault();
       document.getElementById('search-input')?.focus();
     }
-  }, [navState, filteredPillars, filteredExecutions, selectedPillarId, selectedExecutionId, isGeneratorOpen, isSettingsOpen]);
+    // Undo/Redo
+    else if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+      e.preventDefault();
+      handleUndo();
+    }
+    else if ((e.metaKey || e.ctrlKey) && (e.key === 'y' || (e.shiftKey && e.key === 'z'))) {
+      e.preventDefault();
+      handleRedo();
+    }
+  }, [navState, filteredPillars, filteredExecutions, selectedPillarId, selectedExecutionId, isGeneratorOpen, isSettingsOpen, editorHistory]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -218,9 +232,52 @@ function App() {
 
 
   // --- Handlers ---
-  const updateExecutionContent = (newContent: string) => {
+  const updateExecutionContent = (newContent: string, addToHistory = true) => {
     if (!selectedExecutionId) return;
+    const currentExec = executions.find(e => e.id === selectedExecutionId);
+    if (addToHistory && currentExec) {
+      setEditorHistory(prev => ({
+        past: [...prev.past.slice(-49), currentExec.content],
+        future: [],
+      }));
+    }
     setExecutions(prev => prev.map(e => e.id === selectedExecutionId ? { ...e, content: newContent, lastEdited: new Date().toISOString() } : e));
+  };
+
+  const handleUndo = () => {
+    if (editorHistory.past.length === 0) return;
+    const currentExec = executions.find(e => e.id === selectedExecutionId);
+    if (!currentExec) return;
+    const previous = editorHistory.past[editorHistory.past.length - 1];
+    setEditorHistory(prev => ({
+      past: prev.past.slice(0, -1),
+      future: [currentExec.content, ...prev.future],
+    }));
+    setExecutions(prev => prev.map(e => e.id === selectedExecutionId ? { ...e, content: previous, lastEdited: new Date().toISOString() } : e));
+  };
+
+  const handleRedo = () => {
+    if (editorHistory.future.length === 0) return;
+    const currentExec = executions.find(e => e.id === selectedExecutionId);
+    if (!currentExec) return;
+    const next = editorHistory.future[0];
+    setEditorHistory(prev => ({
+      past: [...prev.past, currentExec.content],
+      future: prev.future.slice(1),
+    }));
+    setExecutions(prev => prev.map(e => e.id === selectedExecutionId ? { ...e, content: next, lastEdited: new Date().toISOString() } : e));
+  };
+
+  const handleArchivePillar = (pillarId: string) => {
+    setPillars(prev => prev.map(p =>
+      p.id === pillarId ? { ...p, status: p.status === 'archived' ? 'active' : 'archived' } : p
+    ));
+  };
+
+  const handleUpdatePillarThemes = (pillarId: string, themes: string[]) => {
+    setPillars(prev => prev.map(p =>
+      p.id === pillarId ? { ...p, themes } : p
+    ));
   };
 
   const handleAddPillar = async () => {
@@ -426,25 +483,40 @@ function App() {
           onClick={() => setNavState({ ...navState, column: 0 })}
           className={`w-[320px] flex flex-col border-r border-gray-800 bg-gray-950 transition-colors ${navState.column === 0 ? 'bg-gray-900/30' : ''}`}
         >
-           <div className="p-4 border-b border-gray-800 flex justify-between items-center shrink-0">
-              <h2 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Strategy / Pillars</h2>
-              <div className="flex space-x-2">
-                <button onClick={handleAnalyzeThemes} className="text-[10px] px-2 py-1 bg-indigo-900/20 text-indigo-400 rounded hover:bg-indigo-900/40 transition-colors" title="Analyze Themes">
-                   ✨ Themes
-                </button>
-                <button onClick={handleAddPillar} className="text-xs hover:text-white text-gray-500 flex items-center transition-colors">
-                  <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                  Ideate
-                </button>
+           <div className="p-4 border-b border-gray-800 flex flex-col space-y-2 shrink-0">
+              <div className="flex justify-between items-center">
+                <h2 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Strategy / Pillars</h2>
+                <div className="flex space-x-2">
+                  <button onClick={handleAnalyzeThemes} className="text-[10px] px-2 py-1 bg-indigo-900/20 text-indigo-400 rounded hover:bg-indigo-900/40 transition-colors" title="Analyze Themes">
+                     ✨ Themes
+                  </button>
+                  <button onClick={handleAddPillar} className="text-xs hover:text-white text-gray-500 flex items-center transition-colors">
+                    <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    Ideate
+                  </button>
+                </div>
+              </div>
+              <div className="flex space-x-1">
+                {(['active', 'archived', 'all'] as const).map(status => (
+                  <button
+                    key={status}
+                    onClick={() => setFilterStatus(status)}
+                    className={`px-2 py-0.5 text-[10px] rounded transition-colors ${filterStatus === status ? 'bg-gray-800 text-white' : 'text-gray-600 hover:text-gray-400'}`}
+                  >
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </button>
+                ))}
               </div>
            </div>
            <div className="overflow-y-auto flex-1 pb-10">
               {filteredPillars.map(p => (
-                <PillarCard 
-                  key={p.id} 
-                  pillar={p} 
+                <PillarCard
+                  key={p.id}
+                  pillar={p}
                   isActive={selectedPillarId === p.id}
                   onClick={() => { setSelectedPillarId(p.id); setNavState({ ...navState, column: 0 }); }}
+                  onArchive={() => handleArchivePillar(p.id)}
+                  onUpdateThemes={(themes) => handleUpdatePillarThemes(p.id, themes)}
                 />
               ))}
            </div>
@@ -502,7 +574,27 @@ function App() {
                     </div>
                   )
                 })()}
-                <div className="text-[10px] text-gray-600 font-mono">Cmd+J to Ask AI</div>
+                <div className="flex items-center space-x-3">
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={handleUndo}
+                      disabled={editorHistory.past.length === 0}
+                      className="p-1 text-gray-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      title="Undo (Cmd+Z)"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
+                    </button>
+                    <button
+                      onClick={handleRedo}
+                      disabled={editorHistory.future.length === 0}
+                      className="p-1 text-gray-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      title="Redo (Cmd+Shift+Z)"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6" /></svg>
+                    </button>
+                  </div>
+                  <div className="text-[10px] text-gray-600 font-mono">Cmd+J to Ask AI</div>
+                </div>
               </div>
 
               {/* Canvas */}
@@ -688,6 +780,24 @@ function App() {
                 <div className="flex-1 bg-gray-900 p-8 overflow-y-auto">
                   {settingsTab === 'general' ? (
                     <div className="space-y-8">
+                       <div>
+                         <label className="block text-sm font-medium text-gray-300 mb-2">Gemini API Key</label>
+                         <div className="text-xs text-gray-500 mb-3">Get your API key from <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer" className="text-accent-400 hover:underline">Google AI Studio</a>.</div>
+                         <input
+                           type="password"
+                           className="w-full bg-gray-950 border border-gray-700 rounded-lg p-3 text-sm text-gray-200 focus:border-accent-500 focus:ring-1 focus:ring-accent-500 outline-none font-mono"
+                           value={settings.apiKey || ''}
+                           onChange={(e) => updateSettings({...settings, apiKey: e.target.value})}
+                           placeholder="AIza..."
+                         />
+                         {!settings.apiKey && (
+                           <div className="mt-2 text-xs text-yellow-500/80 flex items-center">
+                             <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                             API key required for AI features
+                           </div>
+                         )}
+                       </div>
+
                        <div>
                          <label className="block text-sm font-medium text-gray-300 mb-2">AI Model</label>
                          <div className="text-xs text-gray-500 mb-3">Select the intelligence level for content generation.</div>

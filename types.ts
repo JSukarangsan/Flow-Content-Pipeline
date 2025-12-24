@@ -39,5 +39,13 @@ export interface PlatformSettings {
 export interface UserSettings {
   model: string;
   globalVoice: string;
+  apiKey: string;
   platforms: Record<Platform, PlatformSettings>;
+}
+
+// Editor history for undo/redo
+export interface EditorHistory {
+  past: string[];
+  present: string;
+  future: string[];
 }

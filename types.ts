@@ -49,3 +49,39 @@ export interface EditorHistory {
   present: string;
   future: string[];
 }
+
+// Plays System
+export type PlayTrigger = 'long-form' | 'case-study' | 'question';
+
+export interface PlayInput {
+  id: string;
+  label: string;
+  type: 'text' | 'textarea' | 'pillar-select';
+  placeholder: string;
+  required: boolean;
+}
+
+export interface PlayOutput {
+  platform: Platform;
+  description: string;
+}
+
+export interface Play {
+  id: string;
+  name: string;
+  description: string;
+  trigger: PlayTrigger;
+  icon: string; // Emoji or icon identifier
+  inputs: PlayInput[];
+  outputs: PlayOutput[];
+  promptTemplate: string; // Template for AI generation
+}
+
+export interface PlayExecutionResult {
+  playId: string;
+  pillarId: string;
+  outputs: {
+    platform: Platform;
+    content: string;
+  }[];
+}

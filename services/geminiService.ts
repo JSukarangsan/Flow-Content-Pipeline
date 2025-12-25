@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { AIExecutionSuggestion, Platform, UserSettings, Pillar } from '../types';
+import { AIExecutionSuggestion, Platform, UserSettings, Pillar, Play } from '../types';
 
 // Initialize the client with user-provided API key
 const getAiClient = (settings: UserSettings) => {
@@ -185,5 +185,96 @@ export const refineCopy = async (currentCopy: string, instructions: string, sett
   } catch (error) {
     console.error("Error refining copy:", error);
     return currentCopy;
+  }
+};
+
+// Play execution
+export interface PlayExecutionOutput {
+  platform: Platform;
+  content: string;
+  description: string;
+}
+
+export const executePlay = async (
+  play: Play,
+  inputValues: Record<string, string>,
+  pillar: Pillar | null,
+  settings: UserSettings
+): Promise<PlayExecutionOutput[]> => {
+  const ai = getAiClient(settings);
+  if (!ai) throw new Error("API Key not configured. Add your Gemini API key in Settings.");
+
+  // Build the prompt by replacing template variables
+  let prompt = play.promptTemplate;
+
+  // Replace pillar-related variables if pillar is selected
+  if (pillar) {
+    prompt = prompt.replace(/\{\{coreIdea\}\}/g, pillar.coreIdea);
+    prompt = prompt.replace(/\{\{title\}\}/g, pillar.title);
+    prompt = prompt.replace(/\{\{topic\}\}/g, pillar.topic);
+  }
+
+  // Replace input values
+  Object.entries(inputValues).forEach(([key, value]) => {
+    // Handle conditional blocks {{#if key}}...{{/if}}
+    const conditionalRegex = new RegExp(`\\{\\{#if ${key}\\}\\}([\\s\\S]*?)\\{\\{/if\\}\\}`, 'g');
+    if (value && value.trim()) {
+      prompt = prompt.replace(conditionalRegex, '$1');
+      prompt = prompt.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value);
+    } else {
+      prompt = prompt.replace(conditionalRegex, '');
+    }
+  });
+
+  // Add voice and platform guidelines
+  const platformGuidelines = play.outputs.map(output => {
+    const config = settings.platforms[output.platform];
+    return `
+--- ${output.platform.toUpperCase()} ---
+Expected: ${output.description}
+Format Guidelines: ${config.customPrompt}
+${config.writingSamples ? `Style Reference:\n${config.writingSamples}` : ''}
+    `;
+  }).join('\n');
+
+  const fullPrompt = `${prompt}
+
+VOICE/TONE TO USE: ${settings.globalVoice}
+
+PLATFORM-SPECIFIC GUIDELINES:
+${platformGuidelines}
+
+Return your response as a JSON array where each item has:
+- platform: the platform name (lowercase)
+- content: the generated content
+- description: a brief note on what this piece is (e.g., "Metrics-focused post", "Hot take tweet")`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: settings.model,
+      contents: fullPrompt,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              platform: { type: Type.STRING, enum: ['linkedin', 'twitter', 'newsletter', 'youtube', 'instagram'] },
+              content: { type: Type.STRING },
+              description: { type: Type.STRING },
+            },
+            required: ['platform', 'content', 'description'],
+          },
+        },
+      },
+    });
+
+    const text = response.text;
+    if (!text) return [];
+    return JSON.parse(text);
+  } catch (error) {
+    console.error("Error executing play:", error);
+    throw error;
   }
 };

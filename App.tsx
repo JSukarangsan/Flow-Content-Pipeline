@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { INITIAL_PILLARS, INITIAL_EXECUTIONS, TOPICS, PLATFORM_CONFIG, DEFAULT_SETTINGS } from './constants';
-import { Pillar, Execution, NavState, Platform, UserSettings, PlatformSettings } from './types';
+import { Pillar, Execution, NavState, Platform, UserSettings, PlatformSettings, Play } from './types';
 import { PillarCard } from './components/PillarCard';
 import { ExecutionCard } from './components/ExecutionCard';
-import { generateExecutions, generatePillarIdeas, refineCopy, analyzeThemes } from './services/geminiService';
+import { PlayCard } from './components/PlayCard';
+import { PlayModal } from './components/PlayModal';
+import { generateExecutions, generatePillarIdeas, refineCopy, analyzeThemes, executePlay } from './services/geminiService';
+import { PLAYS } from './plays';
 
 function App() {
   // --- State ---
@@ -66,6 +69,10 @@ function App() {
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [genPlatforms, setGenPlatforms] = useState<Platform[]>(['twitter', 'linkedin']);
   const [genInstructions, setGenInstructions] = useState('');
+
+  // Plays State
+  const [isPlaysOpen, setIsPlaysOpen] = useState(false);
+  const [selectedPlay, setSelectedPlay] = useState<Play | null>(null);
 
   // AI Editor State
   const [editorPrompt, setEditorPrompt] = useState('');
@@ -379,6 +386,51 @@ function App() {
     }
   };
 
+  // --- Plays Handlers ---
+  const handlePlaySelect = (play: Play) => {
+    setSelectedPlay(play);
+    setIsPlaysOpen(false);
+  };
+
+  const handlePlayExecute = async (inputValues: Record<string, string>) => {
+    if (!selectedPlay) return;
+
+    // Find the pillar if one was selected
+    const pillarId = inputValues.pillar;
+    const pillar = pillarId ? pillars.find(p => p.id === pillarId) : null;
+
+    setIsAiLoading(true);
+    setAiMessage(`Running ${selectedPlay.name}...`);
+
+    try {
+      const outputs = await executePlay(selectedPlay, inputValues, pillar || null, settings);
+
+      // Create executions from the outputs
+      const targetPillarId = pillar?.id || selectedPillarId || pillars[0]?.id;
+      const newExecutions = outputs.map((output, i) => ({
+        id: `play-e-${Date.now()}-${i}`,
+        pillarId: targetPillarId,
+        platform: output.platform,
+        status: 'draft' as const,
+        content: output.content,
+        lastEdited: new Date().toISOString(),
+      }));
+
+      setExecutions(prev => [...prev, ...newExecutions]);
+
+      // Select the pillar and first new execution
+      if (targetPillarId) setSelectedPillarId(targetPillarId);
+      if (newExecutions.length > 0) setSelectedExecutionId(newExecutions[0].id);
+
+      setSelectedPlay(null);
+    } catch (e) {
+      alert(`Failed to run ${selectedPlay.name}`);
+    } finally {
+      setIsAiLoading(false);
+      setAiMessage('');
+    }
+  };
+
   // --- Settings Helpers ---
   const handlePlatformSettingChange = (platform: Platform, field: keyof PlatformSettings, value: string) => {
     const newSettings = { ...settings };
@@ -459,7 +511,16 @@ function App() {
                 </div>
               )}
               
-              <button 
+              <button
+                onClick={() => setIsPlaysOpen(true)}
+                className="px-3 py-1.5 text-sm bg-accent-600 text-white rounded-md hover:bg-accent-500 transition-colors flex items-center space-x-1"
+                title="Run a Play"
+              >
+                <span>🎬</span>
+                <span>Plays</span>
+              </button>
+
+              <button
                 onClick={() => setIsSettingsOpen(true)}
                 className="p-2 text-gray-500 hover:text-white transition-colors rounded-md hover:bg-gray-900"
                 title="Settings"
@@ -874,6 +935,46 @@ function App() {
               </div>
            </div>
         </div>
+      )}
+
+      {/* PLAYS LIBRARY MODAL */}
+      {isPlaysOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-start pt-[10vh] justify-center z-50">
+          <div className="bg-gray-900 border border-gray-800 w-[500px] rounded-xl shadow-2xl overflow-hidden animate-fade-in-down">
+            <div className="p-6 border-b border-gray-800">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-medium text-white">Run a Play</h3>
+                  <p className="text-sm text-gray-500 mt-1">Transform ideas into multi-platform content</p>
+                </div>
+                <button
+                  onClick={() => setIsPlaysOpen(false)}
+                  className="p-1 text-gray-500 hover:text-white transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className="p-4 space-y-3 max-h-[60vh] overflow-y-auto">
+              {PLAYS.map((play) => (
+                <PlayCard key={play.id} play={play} onClick={() => handlePlaySelect(play)} />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PLAY EXECUTION MODAL */}
+      {selectedPlay && (
+        <PlayModal
+          play={selectedPlay}
+          pillars={pillars}
+          isLoading={isAiLoading}
+          onClose={() => setSelectedPlay(null)}
+          onExecute={handlePlayExecute}
+        />
       )}
     </div>
   );

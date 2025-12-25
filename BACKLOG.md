@@ -5,7 +5,7 @@
 | Phase | Focus | Status |
 |-------|-------|--------|
 | V1.0 | Core MVP (current) | ✅ Complete |
-| V1.1 | Plays System | 🔲 Planned |
+| V1.1 | Plays System | ✅ Complete |
 | V1.2 | Strategy Copilot | 🔲 Planned |
 | V2.0 | Integrations & Play Builder | 🔲 Future |
 

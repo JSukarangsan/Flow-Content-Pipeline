@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { INITIAL_PILLARS, INITIAL_EXECUTIONS, TOPICS, PLATFORM_CONFIG, DEFAULT_SETTINGS } from './constants';
-import { Pillar, Execution, NavState, Platform, UserSettings, PlatformSettings, Play, WeeklyPlan, PlannedPost } from './types';
+import { Pillar, Execution, NavState, Platform, UserSettings, PlatformSettings, Play, WeeklyPlan, PlannedPost, NotionIdea, MCPConfig } from './types';
 import { PillarCard } from './components/PillarCard';
 import { ExecutionCard } from './components/ExecutionCard';
 import { PlayCard } from './components/PlayCard';
@@ -10,6 +10,7 @@ import { WeeklyPlanModal } from './components/WeeklyPlanModal';
 import { PlanReviewPanel } from './components/PlanReviewPanel';
 import { ImportedPerformanceData } from './services/csvImportService';
 import { generateExecutions, generatePillarIdeas, refineCopy, analyzeThemes, executePlay } from './services/geminiService';
+import { fetchNotionIdeas, fetchNotionDatabases, NotionDatabase, markIdeaAsUsed } from './services/notionMcpService';
 import { PLAYS } from './plays';
 
 function App() {
@@ -67,7 +68,7 @@ function App() {
   // Settings State
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [settingsTab, setSettingsTab] = useState<'general' | Platform>('general');
+  const [settingsTab, setSettingsTab] = useState<'general' | 'mcp' | Platform>('general');
 
   // Generator Modal State
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
@@ -95,6 +96,11 @@ function App() {
     }
     return [];
   });
+
+  // Notion/MCP State
+  const [notionIdeas, setNotionIdeas] = useState<NotionIdea[]>([]);
+  const [notionDatabases, setNotionDatabases] = useState<NotionDatabase[]>([]);
+  const [isLoadingNotion, setIsLoadingNotion] = useState(false);
 
   // AI Editor State
   const [editorPrompt, setEditorPrompt] = useState('');
@@ -476,8 +482,21 @@ function App() {
   };
 
   // --- Weekly Plan Handlers ---
-  const handlePlanGenerated = (plan: WeeklyPlan) => {
+  const handlePlanGenerated = async (plan: WeeklyPlan, usedIdeaIds?: string[]) => {
     setWeeklyPlans(prev => [plan, ...prev]);
+
+    // Mark used Notion ideas as used
+    if (usedIdeaIds && usedIdeaIds.length > 0 && settings.mcp?.enabled) {
+      // Update local state
+      setNotionIdeas(prev => prev.map(idea =>
+        usedIdeaIds.includes(idea.id) ? { ...idea, status: 'used' as const } : idea
+      ));
+
+      // Mark as used via MCP (async, don't wait)
+      usedIdeaIds.forEach(ideaId => {
+        markIdeaAsUsed(ideaId, settings.mcp!).catch(console.error);
+      });
+    }
   };
 
   const handleUpdatePlannedPost = (postId: string, updates: Partial<PlannedPost>) => {
@@ -980,7 +999,7 @@ function App() {
                   
                   <div className="px-4 mt-6 mb-2 text-xs font-mono text-gray-500 uppercase tracking-widest">Platform Tuning</div>
                   {(['twitter', 'linkedin', 'newsletter', 'instagram', 'youtube'] as Platform[]).map(p => (
-                    <button 
+                    <button
                       key={p}
                       onClick={() => setSettingsTab(p)}
                       className={`w-full text-left px-6 py-2 text-sm transition-colors ${settingsTab === p ? 'text-accent-400 bg-gray-900 border-r-2 border-accent-500' : 'text-gray-400 hover:bg-gray-900 hover:text-gray-200'}`}
@@ -988,6 +1007,20 @@ function App() {
                       {PLATFORM_CONFIG[p].label}
                     </button>
                   ))}
+
+                  <div className="px-4 mt-6 mb-2 text-xs font-mono text-gray-500 uppercase tracking-widest">Integrations</div>
+                  <button
+                    onClick={() => {
+                      setSettingsTab('mcp');
+                      // Load databases when opening MCP tab
+                      if (notionDatabases.length === 0) {
+                        fetchNotionDatabases().then(setNotionDatabases);
+                      }
+                    }}
+                    className={`w-full text-left px-6 py-2 text-sm transition-colors ${settingsTab === 'mcp' ? 'text-accent-400 bg-gray-900 border-r-2 border-accent-500' : 'text-gray-400 hover:bg-gray-900 hover:text-gray-200'}`}
+                  >
+                    Notion (MCP)
+                  </button>
                 </div>
 
                 {/* Content */}
@@ -1017,10 +1050,10 @@ function App() {
                          <div className="text-xs text-gray-500 mb-3">Select the intelligence level for content generation.</div>
                          <div className="flex gap-4">
                            <label className={`flex-1 p-4 border rounded-lg cursor-pointer transition-colors ${settings.model === 'gemini-2.5-flash' ? 'bg-gray-800 border-accent-500' : 'bg-transparent border-gray-700 hover:bg-gray-800'}`}>
-                              <input 
-                                type="radio" 
-                                name="model" 
-                                value="gemini-2.5-flash" 
+                              <input
+                                type="radio"
+                                name="model"
+                                value="gemini-2.5-flash"
                                 checked={settings.model === 'gemini-2.5-flash'}
                                 onChange={() => updateSettings({...settings, model: 'gemini-2.5-flash'})}
                                 className="hidden"
@@ -1029,10 +1062,10 @@ function App() {
                               <div className="text-xs text-gray-500 mt-1">Fast, efficient, great for drafting and simple edits.</div>
                            </label>
                            <label className={`flex-1 p-4 border rounded-lg cursor-pointer transition-colors ${settings.model === 'gemini-3-pro-preview' ? 'bg-gray-800 border-accent-500' : 'bg-transparent border-gray-700 hover:bg-gray-800'}`}>
-                              <input 
-                                type="radio" 
-                                name="model" 
-                                value="gemini-3-pro-preview" 
+                              <input
+                                type="radio"
+                                name="model"
+                                value="gemini-3-pro-preview"
                                 checked={settings.model === 'gemini-3-pro-preview'}
                                 onChange={() => updateSettings({...settings, model: 'gemini-3-pro-preview'})}
                                 className="hidden"
@@ -1046,12 +1079,146 @@ function App() {
                        <div>
                          <label className="block text-sm font-medium text-gray-300 mb-2">Global Brand Voice</label>
                          <div className="text-xs text-gray-500 mb-3">The core personality that applies to ALL content.</div>
-                         <textarea 
+                         <textarea
                             className="w-full h-32 bg-gray-950 border border-gray-700 rounded-lg p-4 text-sm text-gray-200 focus:border-accent-500 focus:ring-1 focus:ring-accent-500 outline-none resize-none"
                             value={settings.globalVoice}
                             onChange={(e) => updateSettings({...settings, globalVoice: e.target.value})}
                             placeholder="Describe your voice..."
                          />
+                       </div>
+                    </div>
+                  ) : settingsTab === 'mcp' ? (
+                    <div className="space-y-8">
+                       <div className="flex items-center space-x-2 mb-6">
+                          <h3 className="text-xl font-medium text-white">Notion Integration</h3>
+                          <span className="px-2 py-0.5 rounded text-[10px] uppercase border border-indigo-900 text-indigo-500">MCP</span>
+                       </div>
+
+                       <div className="p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
+                         <p className="text-sm text-gray-300">
+                           Connect your Notion database to pull ideas directly into your weekly content plans.
+                           Ideas marked as &quot;unprocessed&quot; will be suggested during planning.
+                         </p>
+                       </div>
+
+                       <div>
+                         <div className="flex items-center justify-between mb-4">
+                           <label className="block text-sm font-medium text-gray-300">Enable Notion Sync</label>
+                           <button
+                             onClick={() => updateSettings({
+                               ...settings,
+                               mcp: { ...settings.mcp, enabled: !settings.mcp?.enabled }
+                             })}
+                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                               settings.mcp?.enabled ? 'bg-accent-600' : 'bg-gray-700'
+                             }`}
+                           >
+                             <span
+                               className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                 settings.mcp?.enabled ? 'translate-x-6' : 'translate-x-1'
+                               }`}
+                             />
+                           </button>
+                         </div>
+                       </div>
+
+                       {settings.mcp?.enabled && (
+                         <>
+                           <div>
+                             <label className="block text-sm font-medium text-gray-300 mb-2">Select Database</label>
+                             <div className="text-xs text-gray-500 mb-3">
+                               Choose the Notion database containing your content ideas.
+                             </div>
+                             <div className="space-y-2">
+                               {notionDatabases.map((db) => (
+                                 <button
+                                   key={db.id}
+                                   onClick={() => updateSettings({
+                                     ...settings,
+                                     mcp: { ...settings.mcp, enabled: true, notionDatabaseId: db.id }
+                                   })}
+                                   className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                                     settings.mcp?.notionDatabaseId === db.id
+                                       ? 'bg-accent-600/20 border-accent-500 text-white'
+                                       : 'bg-gray-800 border-gray-700 text-gray-300 hover:border-gray-600'
+                                   }`}
+                                 >
+                                   <div className="flex justify-between items-center">
+                                     <span className="font-medium">{db.title}</span>
+                                     {db.itemCount !== undefined && (
+                                       <span className="text-xs text-gray-500">{db.itemCount} items</span>
+                                     )}
+                                   </div>
+                                 </button>
+                               ))}
+                               {notionDatabases.length === 0 && (
+                                 <div className="text-sm text-gray-500 text-center py-4">
+                                   Loading databases...
+                                 </div>
+                               )}
+                             </div>
+                           </div>
+
+                           {settings.mcp?.notionDatabaseId && (
+                             <div>
+                               <label className="block text-sm font-medium text-gray-300 mb-2">Sync Ideas</label>
+                               <button
+                                 onClick={async () => {
+                                   setIsLoadingNotion(true);
+                                   try {
+                                     const ideas = await fetchNotionIdeas(settings.mcp!);
+                                     setNotionIdeas(ideas);
+                                     updateSettings({
+                                       ...settings,
+                                       mcp: { ...settings.mcp!, lastSyncAt: new Date().toISOString() }
+                                     });
+                                   } finally {
+                                     setIsLoadingNotion(false);
+                                   }
+                                 }}
+                                 disabled={isLoadingNotion}
+                                 className="px-4 py-2 bg-accent-600 text-white text-sm font-medium rounded hover:bg-accent-500 transition-colors disabled:opacity-50"
+                               >
+                                 {isLoadingNotion ? 'Syncing...' : 'Sync Now'}
+                               </button>
+                               {settings.mcp?.lastSyncAt && (
+                                 <p className="text-xs text-gray-500 mt-2">
+                                   Last synced: {new Date(settings.mcp.lastSyncAt).toLocaleString()}
+                                 </p>
+                               )}
+                               {notionIdeas.length > 0 && (
+                                 <div className="mt-4">
+                                   <p className="text-sm text-gray-400 mb-2">
+                                     {notionIdeas.filter(i => i.status === 'unprocessed').length} unprocessed ideas available
+                                   </p>
+                                   <div className="max-h-48 overflow-y-auto space-y-2">
+                                     {notionIdeas.filter(i => i.status === 'unprocessed').slice(0, 5).map((idea) => (
+                                       <div key={idea.id} className="p-2 bg-gray-800/50 rounded text-sm">
+                                         <div className="text-white">{idea.title}</div>
+                                         {idea.tags.length > 0 && (
+                                           <div className="flex gap-1 mt-1">
+                                             {idea.tags.map((tag) => (
+                                               <span key={tag} className="text-[10px] px-1.5 py-0.5 bg-gray-700 rounded text-gray-400">
+                                                 {tag}
+                                               </span>
+                                             ))}
+                                           </div>
+                                         )}
+                                       </div>
+                                     ))}
+                                   </div>
+                                 </div>
+                               )}
+                             </div>
+                           )}
+                         </>
+                       )}
+
+                       <div className="pt-4 border-t border-gray-800">
+                         <p className="text-xs text-gray-600">
+                           MCP (Model Context Protocol) enables secure integration with external tools.
+                           When running in Claude Code, connect the Notion MCP server for full functionality.
+                         </p>
                        </div>
                     </div>
                   ) : (
@@ -1064,7 +1231,7 @@ function App() {
                        <div>
                          <label className="block text-sm font-medium text-gray-300 mb-2">Format Guidelines</label>
                          <div className="text-xs text-gray-500 mb-3">Specific rules for structure, length, and formatting on this channel.</div>
-                         <textarea 
+                         <textarea
                             className="w-full h-32 bg-gray-950 border border-gray-700 rounded-lg p-4 text-sm text-gray-200 focus:border-accent-500 focus:ring-1 focus:ring-accent-500 outline-none resize-none"
                             value={settings.platforms[settingsTab].customPrompt}
                             onChange={(e) => handlePlatformSettingChange(settingsTab, 'customPrompt', e.target.value)}
@@ -1075,7 +1242,7 @@ function App() {
                        <div>
                          <label className="block text-sm font-medium text-gray-300 mb-2">Writing Samples (Few-Shot)</label>
                          <div className="text-xs text-gray-500 mb-3">Paste 3-5 examples of your BEST content on this platform. The AI will mimic this style.</div>
-                         <textarea 
+                         <textarea
                             className="w-full h-48 bg-gray-950 border border-gray-700 rounded-lg p-4 text-sm text-gray-200 focus:border-accent-500 focus:ring-1 focus:ring-accent-500 outline-none resize-none font-mono"
                             value={settings.platforms[settingsTab].writingSamples}
                             onChange={(e) => handlePlatformSettingChange(settingsTab, 'writingSamples', e.target.value)}
@@ -1145,6 +1312,7 @@ function App() {
           pillars={pillars}
           executions={executions}
           settings={settings}
+          notionIdeas={notionIdeas}
           onClose={() => setIsWeeklyPlanOpen(false)}
           onPlanGenerated={handlePlanGenerated}
         />

@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { AIExecutionSuggestion, Platform, UserSettings, Pillar, Play, Execution, PlannedPost } from '../types';
+import { AIExecutionSuggestion, Platform, UserSettings, Pillar, Play, Execution, PlannedPost, NotionIdea } from '../types';
 
 // Initialize the client with user-provided API key
 const getAiClient = (settings: UserSettings) => {
@@ -285,6 +285,7 @@ export interface WeeklyPlanInput {
   topPerformingContent: Execution[];
   platformMix: Platform[];
   postsPerWeek: number;
+  notionIdeas?: NotionIdea[];
 }
 
 export interface GeneratedPlan {
@@ -317,13 +318,27 @@ export const generateWeeklyPlan = async (
     themes: p.themes,
   }));
 
+  // Prepare Notion ideas if available
+  const notionIdeasSection = input.notionIdeas && input.notionIdeas.length > 0
+    ? `\n\nEXTERNAL IDEAS FROM NOTION (prioritize incorporating these):\n${JSON.stringify(
+        input.notionIdeas.map(idea => ({
+          title: idea.title,
+          notes: idea.notes,
+          tags: idea.tags,
+          url: idea.url,
+        })),
+        null,
+        2
+      )}`
+    : '';
+
   const prompt = `You are a content strategist creating a weekly content plan.
 
 AVAILABLE PILLARS:
 ${JSON.stringify(pillarSummary, null, 2)}
 
 TOP PERFORMING CONTENT (for style/topic inspiration):
-${JSON.stringify(topContentSummary, null, 2)}
+${JSON.stringify(topContentSummary, null, 2)}${notionIdeasSection}
 
 PLATFORM MIX TO USE: ${input.platformMix.join(', ')}
 TARGET POSTS THIS WEEK: ${input.postsPerWeek}
@@ -337,6 +352,7 @@ Create a weekly content plan that:
 4. Varies the platforms according to the platform mix
 5. Provides a compelling hook (opening line) for each post
 6. Explains the reasoning behind each post's timing and angle
+${input.notionIdeas && input.notionIdeas.length > 0 ? '7. IMPORTANT: Incorporate the Notion ideas provided - use them as inspiration for specific posts' : ''}
 
 Also provide overall insights about the plan - what themes are emphasized, any strategic recommendations, etc.`;
 

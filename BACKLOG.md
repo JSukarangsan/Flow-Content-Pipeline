@@ -231,11 +231,10 @@ NEWSLETTER (Sunday)
 | Weekly Plan Generator | ✅ | AI-powered planning with pillar balancing |
 | Plan Review UI | ✅ | Calendar + list view, draft from planned posts |
 | Plan Persistence | ✅ | LocalStorage for weekly plans |
-| Notion MCP Integration | 🔲 | Deferred to V2.0 |
+| Notion MCP Integration | ✅ | Database selection, idea sync, auto-mark as used |
 
 ### V2.0 Scope (Future)
 
-- Notion MCP integration for idea capture
 - Play Builder (custom play creation)
 - Play sharing/importing
 - Calendar integration for scheduling

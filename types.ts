@@ -62,6 +62,7 @@ export interface UserSettings {
   globalVoice: string;
   apiKey: string;
   platforms: Record<Platform, PlatformSettings>;
+  mcp?: MCPConfig;
 }
 
 // Editor history for undo/redo
@@ -127,4 +128,21 @@ export interface WeeklyPlan {
   posts: PlannedPost[];
   createdAt: string;
   insights?: string; // AI-generated insights about the plan
+}
+
+// MCP Integration - Notion
+export interface NotionIdea {
+  id: string;
+  title: string;
+  url?: string;
+  notes?: string;
+  tags: string[];
+  status: 'unprocessed' | 'used' | 'archived';
+  createdAt?: string;
+}
+
+export interface MCPConfig {
+  enabled: boolean;
+  notionDatabaseId?: string;
+  lastSyncAt?: string;
 }

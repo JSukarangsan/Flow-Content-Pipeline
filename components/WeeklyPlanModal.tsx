@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Pillar, Execution, Platform, WeeklyPlan, PlannedPost, UserSettings } from '../types';
+import { Pillar, Execution, Platform, WeeklyPlan, PlannedPost, UserSettings, NotionIdea } from '../types';
 import { generateWeeklyPlan, GeneratedPlan } from '../services/geminiService';
 import { PLATFORM_CONFIG } from '../constants';
 
@@ -7,8 +7,9 @@ interface WeeklyPlanModalProps {
   pillars: Pillar[];
   executions: Execution[];
   settings: UserSettings;
+  notionIdeas?: NotionIdea[];
   onClose: () => void;
-  onPlanGenerated: (plan: WeeklyPlan) => void;
+  onPlanGenerated: (plan: WeeklyPlan, usedIdeaIds?: string[]) => void;
 }
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -17,6 +18,7 @@ export const WeeklyPlanModal: React.FC<WeeklyPlanModalProps> = ({
   pillars,
   executions,
   settings,
+  notionIdeas = [],
   onClose,
   onPlanGenerated,
 }) => {
@@ -25,6 +27,18 @@ export const WeeklyPlanModal: React.FC<WeeklyPlanModalProps> = ({
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>(['linkedin', 'twitter']);
   const [generatedPlan, setGeneratedPlan] = useState<GeneratedPlan | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedIdeaIds, setSelectedIdeaIds] = useState<string[]>([]);
+
+  // Filter to only unprocessed ideas
+  const availableIdeas = useMemo(() => {
+    return notionIdeas.filter(idea => idea.status === 'unprocessed');
+  }, [notionIdeas]);
+
+  const toggleIdea = (ideaId: string) => {
+    setSelectedIdeaIds(prev =>
+      prev.includes(ideaId) ? prev.filter(id => id !== ideaId) : [...prev, ideaId]
+    );
+  };
 
   // Get top performing published content
   const topPerforming = useMemo(() => {
@@ -55,6 +69,9 @@ export const WeeklyPlanModal: React.FC<WeeklyPlanModalProps> = ({
     setError(null);
     setStep('generating');
 
+    // Get selected Notion ideas
+    const selectedIdeas = availableIdeas.filter(idea => selectedIdeaIds.includes(idea.id));
+
     try {
       const plan = await generateWeeklyPlan(
         {
@@ -62,6 +79,7 @@ export const WeeklyPlanModal: React.FC<WeeklyPlanModalProps> = ({
           topPerformingContent: topPerforming,
           platformMix: selectedPlatforms,
           postsPerWeek,
+          notionIdeas: selectedIdeas,
         },
         settings
       );
@@ -96,7 +114,8 @@ export const WeeklyPlanModal: React.FC<WeeklyPlanModalProps> = ({
       createdAt: new Date().toISOString(),
     };
 
-    onPlanGenerated(weeklyPlan);
+    // Pass the plan and used idea IDs for marking as used
+    onPlanGenerated(weeklyPlan, selectedIdeaIds.length > 0 ? selectedIdeaIds : undefined);
     onClose();
   };
 
@@ -226,6 +245,67 @@ export const WeeklyPlanModal: React.FC<WeeklyPlanModalProps> = ({
                   ))}
                 </div>
               </div>
+
+              {/* Notion Ideas */}
+              {availableIdeas.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
+                    Notion Ideas ({selectedIdeaIds.length} selected)
+                  </label>
+                  <p className="text-xs text-gray-500 mb-3">
+                    Select ideas from your Notion database to incorporate into this week&apos;s plan
+                  </p>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {availableIdeas.map((idea) => (
+                      <button
+                        key={idea.id}
+                        onClick={() => toggleIdea(idea.id)}
+                        className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                          selectedIdeaIds.includes(idea.id)
+                            ? 'bg-indigo-600/20 border-indigo-500 text-white'
+                            : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:border-gray-600'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-sm">{idea.title}</div>
+                            {idea.notes && (
+                              <div className="text-xs text-gray-500 mt-1 line-clamp-1">
+                                {idea.notes}
+                              </div>
+                            )}
+                            {idea.tags.length > 0 && (
+                              <div className="flex gap-1 mt-2">
+                                {idea.tags.map((tag) => (
+                                  <span
+                                    key={tag}
+                                    className="text-[10px] px-1.5 py-0.5 bg-gray-700 rounded text-gray-400"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          <div
+                            className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 ml-3 ${
+                              selectedIdeaIds.includes(idea.id)
+                                ? 'bg-indigo-600 border-indigo-500'
+                                : 'border-gray-600'
+                            }`}
+                          >
+                            {selectedIdeaIds.includes(idea.id) && (
+                              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {error && (
                 <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">

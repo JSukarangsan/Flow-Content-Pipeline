@@ -18,6 +18,12 @@ const PlatformIcon = ({ platform }: { platform: string }) => {
   }
 };
 
+const getScoreColor = (score: number) => {
+  if (score >= 70) return 'text-green-400 bg-green-500/10';
+  if (score >= 40) return 'text-yellow-400 bg-yellow-500/10';
+  return 'text-red-400 bg-red-500/10';
+};
+
 export const ExecutionCard: React.FC<ExecutionCardProps> = ({ execution, isActive, onClick }) => {
   const config = PLATFORM_CONFIG[execution.platform];
 
@@ -34,17 +40,37 @@ export const ExecutionCard: React.FC<ExecutionCardProps> = ({ execution, isActiv
             <PlatformIcon platform={execution.platform} />
             <span className="text-xs font-semibold tracking-wide opacity-80">{config.label}</span>
         </div>
-        <div className={`text-[10px] uppercase border px-1.5 py-0.5 rounded ${
-          execution.status === 'published' ? 'border-green-800 text-green-500' : 
-          execution.status === 'scheduled' ? 'border-yellow-800 text-yellow-500' :
-          'border-gray-700 text-gray-600'
-        }`}>
-          {execution.status}
+        <div className="flex items-center space-x-2">
+          {execution.performanceScore !== undefined && (
+            <div className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${getScoreColor(execution.performanceScore)}`}>
+              {execution.performanceScore}
+            </div>
+          )}
+          <div className={`text-[10px] uppercase border px-1.5 py-0.5 rounded ${
+            execution.status === 'published' ? 'border-green-800 text-green-500' :
+            execution.status === 'scheduled' ? 'border-yellow-800 text-yellow-500' :
+            'border-gray-700 text-gray-600'
+          }`}>
+            {execution.status}
+          </div>
         </div>
       </div>
       <p className={`text-xs line-clamp-3 font-mono leading-relaxed ${isActive ? 'text-gray-300' : 'text-gray-500 group-hover:text-gray-400'}`}>
         {execution.content || "(Empty draft)"}
       </p>
+      {execution.performanceMetrics && (
+        <div className="flex flex-wrap gap-2 mt-2 text-[10px] text-gray-500">
+          {execution.performanceMetrics.impressions !== undefined && (
+            <span>{execution.performanceMetrics.impressions.toLocaleString()} views</span>
+          )}
+          {execution.performanceMetrics.engagementRate !== undefined && (
+            <span>{execution.performanceMetrics.engagementRate.toFixed(1)}% eng</span>
+          )}
+          {execution.performanceMetrics.openRate !== undefined && (
+            <span>{execution.performanceMetrics.openRate.toFixed(1)}% opens</span>
+          )}
+        </div>
+      )}
     </div>
   );
 };

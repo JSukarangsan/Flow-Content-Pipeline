@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { INITIAL_PILLARS, INITIAL_EXECUTIONS, TOPICS, PLATFORM_CONFIG, DEFAULT_SETTINGS } from './constants';
-import { Pillar, Execution, NavState, Platform, UserSettings, PlatformSettings, Play } from './types';
+import { Pillar, Execution, NavState, Platform, UserSettings, PlatformSettings, Play, WeeklyPlan, PlannedPost } from './types';
 import { PillarCard } from './components/PillarCard';
 import { ExecutionCard } from './components/ExecutionCard';
 import { PlayCard } from './components/PlayCard';
 import { PlayModal } from './components/PlayModal';
+import { CSVImportModal } from './components/CSVImportModal';
+import { WeeklyPlanModal } from './components/WeeklyPlanModal';
+import { PlanReviewPanel } from './components/PlanReviewPanel';
+import { ImportedPerformanceData } from './services/csvImportService';
 import { generateExecutions, generatePillarIdeas, refineCopy, analyzeThemes, executePlay } from './services/geminiService';
 import { PLAYS } from './plays';
 
@@ -74,6 +78,24 @@ function App() {
   const [isPlaysOpen, setIsPlaysOpen] = useState(false);
   const [selectedPlay, setSelectedPlay] = useState<Play | null>(null);
 
+  // CSV Import State
+  const [isCSVImportOpen, setIsCSVImportOpen] = useState(false);
+
+  // Weekly Plan State
+  const [isWeeklyPlanOpen, setIsWeeklyPlanOpen] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [weeklyPlans, setWeeklyPlans] = useState<WeeklyPlan[]>(() => {
+    const saved = localStorage.getItem('flow_weekly_plans');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+
   // AI Editor State
   const [editorPrompt, setEditorPrompt] = useState('');
 
@@ -106,6 +128,11 @@ function App() {
   useEffect(() => {
     localStorage.setItem('flow_executions', JSON.stringify(executions));
   }, [executions]);
+
+  // Persist weekly plans
+  useEffect(() => {
+    localStorage.setItem('flow_weekly_plans', JSON.stringify(weeklyPlans));
+  }, [weeklyPlans]);
 
   // --- Derived Data ---
   
@@ -431,6 +458,68 @@ function App() {
     }
   };
 
+  // --- CSV Import Handler ---
+  const handleCSVImport = (matches: Map<string, ImportedPerformanceData>) => {
+    setExecutions(prev => prev.map(exec => {
+      const matchedData = matches.get(exec.id);
+      if (matchedData) {
+        return {
+          ...exec,
+          status: 'published' as const,
+          publishedAt: matchedData.publishedAt,
+          performanceScore: matchedData.score,
+          performanceMetrics: matchedData.metrics,
+        };
+      }
+      return exec;
+    }));
+  };
+
+  // --- Weekly Plan Handlers ---
+  const handlePlanGenerated = (plan: WeeklyPlan) => {
+    setWeeklyPlans(prev => [plan, ...prev]);
+  };
+
+  const handleUpdatePlannedPost = (postId: string, updates: Partial<PlannedPost>) => {
+    setWeeklyPlans(prev => prev.map(plan => ({
+      ...plan,
+      posts: plan.posts.map(post =>
+        post.id === postId ? { ...post, ...updates } : post
+      ),
+    })));
+  };
+
+  const handleDraftFromPlan = (post: PlannedPost) => {
+    // Find the pillar for this post
+    const pillar = pillars.find(p => p.id === post.pillarId);
+
+    // Create a new execution draft
+    const newExecution: Execution = {
+      id: `exec-${Date.now()}`,
+      pillarId: post.pillarId,
+      platform: post.platform,
+      status: 'draft',
+      content: `${post.hook}\n\n[${post.angle}]`,
+      lastEdited: new Date().toISOString(),
+    };
+
+    // Add the execution
+    setExecutions(prev => [...prev, newExecution]);
+
+    // Update the planned post to drafted status and link to execution
+    handleUpdatePlannedPost(post.id, {
+      status: 'drafted',
+      executionId: newExecution.id,
+    });
+
+    // Navigate to the new execution
+    if (pillar) setSelectedPillarId(pillar.id);
+    setSelectedExecutionId(newExecution.id);
+    setNavState({ column: 2, editing: false });
+  };
+
+  const selectedPlan = weeklyPlans.find(p => p.id === selectedPlanId);
+
   // --- Settings Helpers ---
   const handlePlatformSettingChange = (platform: Platform, field: keyof PlatformSettings, value: string) => {
     const newSettings = { ...settings };
@@ -519,6 +608,70 @@ function App() {
                 <span>🎬</span>
                 <span>Plays</span>
               </button>
+
+              <button
+                onClick={() => setIsCSVImportOpen(true)}
+                className="px-3 py-1.5 text-sm bg-gray-800 text-gray-300 rounded-md hover:bg-gray-700 hover:text-white transition-colors flex items-center space-x-1"
+                title="Import Performance Data"
+              >
+                <span>📊</span>
+                <span>Import</span>
+              </button>
+
+              <div className="relative group">
+                <button
+                  onClick={() => setIsWeeklyPlanOpen(true)}
+                  className="px-3 py-1.5 text-sm bg-gray-800 text-gray-300 rounded-md hover:bg-gray-700 hover:text-white transition-colors flex items-center space-x-1"
+                  title="Generate Weekly Plan"
+                >
+                  <span>📅</span>
+                  <span>Plan</span>
+                  {weeklyPlans.length > 0 && (
+                    <span className="ml-1 px-1.5 py-0.5 bg-accent-600 text-[10px] rounded-full">
+                      {weeklyPlans.length}
+                    </span>
+                  )}
+                </button>
+                {weeklyPlans.length > 0 && (
+                  <div className="absolute right-0 top-full mt-1 w-64 bg-gray-900 border border-gray-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                    <div className="p-2 border-b border-gray-800 text-xs text-gray-500 font-medium">
+                      Saved Plans
+                    </div>
+                    <div className="max-h-48 overflow-y-auto">
+                      {weeklyPlans.slice(0, 5).map((plan) => (
+                        <button
+                          key={plan.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedPlanId(plan.id);
+                          }}
+                          className="w-full text-left px-3 py-2 hover:bg-gray-800 transition-colors flex justify-between items-center"
+                        >
+                          <span className="text-sm text-gray-300">
+                            Week of {new Date(plan.weekStart).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </span>
+                          <span className={`text-xs px-2 py-0.5 rounded ${
+                            plan.status === 'draft' ? 'bg-yellow-500/20 text-yellow-400' :
+                            plan.status === 'active' ? 'bg-green-500/20 text-green-400' :
+                            'bg-gray-500/20 text-gray-400'
+                          }`}>
+                            {plan.posts.filter(p => p.status === 'drafted' || p.status === 'approved').length}/{plan.posts.length}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsWeeklyPlanOpen(true);
+                      }}
+                      className="w-full text-center px-3 py-2 text-xs text-accent-400 hover:bg-gray-800 transition-colors border-t border-gray-800"
+                    >
+                      + New Plan
+                    </button>
+                  </div>
+                )}
+              </div>
 
               <button
                 onClick={() => setIsSettingsOpen(true)}
@@ -974,6 +1127,37 @@ function App() {
           isLoading={isAiLoading}
           onClose={() => setSelectedPlay(null)}
           onExecute={handlePlayExecute}
+        />
+      )}
+
+      {/* CSV IMPORT MODAL */}
+      {isCSVImportOpen && (
+        <CSVImportModal
+          executions={executions}
+          onClose={() => setIsCSVImportOpen(false)}
+          onImport={handleCSVImport}
+        />
+      )}
+
+      {/* WEEKLY PLAN MODAL */}
+      {isWeeklyPlanOpen && (
+        <WeeklyPlanModal
+          pillars={pillars}
+          executions={executions}
+          settings={settings}
+          onClose={() => setIsWeeklyPlanOpen(false)}
+          onPlanGenerated={handlePlanGenerated}
+        />
+      )}
+
+      {/* PLAN REVIEW PANEL */}
+      {selectedPlan && (
+        <PlanReviewPanel
+          plan={selectedPlan}
+          pillars={pillars}
+          onUpdatePost={handleUpdatePlannedPost}
+          onDraftPost={handleDraftFromPlan}
+          onClose={() => setSelectedPlanId(null)}
         />
       )}
     </div>

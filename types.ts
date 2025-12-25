@@ -9,6 +9,23 @@ export interface Pillar {
   themes?: string[]; // "Red threads" or cross-cutting themes
 }
 
+// Performance metrics from CSV imports (LinkedIn, Kit/Newsletter)
+export interface PerformanceMetrics {
+  impressions?: number;
+  engagements?: number;
+  clicks?: number;
+  reactions?: number;
+  comments?: number;
+  shares?: number;
+  // Newsletter-specific (Kit)
+  opens?: number;
+  openRate?: number;
+  clickRate?: number;
+  unsubscribes?: number;
+  // Computed
+  engagementRate?: number;
+}
+
 export interface Execution {
   id: string;
   pillarId: string;
@@ -16,6 +33,10 @@ export interface Execution {
   status: 'draft' | 'scheduled' | 'published';
   content: string;
   lastEdited: string;
+  // Strategy Copilot fields
+  publishedAt?: string;
+  performanceScore?: number; // 0-100 computed score for AI analysis
+  performanceMetrics?: PerformanceMetrics;
 }
 
 export interface NavState {
@@ -84,4 +105,26 @@ export interface PlayExecutionResult {
     platform: Platform;
     content: string;
   }[];
+}
+
+// Strategy Copilot - Weekly Planning
+export interface PlannedPost {
+  id: string;
+  dayOfWeek: number; // 0-6 (Sunday-Saturday)
+  platform: Platform;
+  pillarId: string;
+  hook: string; // Opening line/hook
+  angle: string; // The specific angle to take
+  reasoning: string; // Why this post at this time
+  status: 'planned' | 'drafted' | 'approved';
+  executionId?: string; // Links to drafted execution
+}
+
+export interface WeeklyPlan {
+  id: string;
+  weekStart: string; // ISO date of the Monday
+  status: 'draft' | 'active' | 'completed';
+  posts: PlannedPost[];
+  createdAt: string;
+  insights?: string; // AI-generated insights about the plan
 }

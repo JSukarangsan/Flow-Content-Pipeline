@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { AIExecutionSuggestion, Platform, UserSettings, Pillar, Play } from '../types';
+import { AIExecutionSuggestion, Platform, UserSettings, Pillar, Play, Execution, PlannedPost } from '../types';
 
 // Initialize the client with user-provided API key
 const getAiClient = (settings: UserSettings) => {
@@ -275,6 +275,107 @@ Return your response as a JSON array where each item has:
     return JSON.parse(text);
   } catch (error) {
     console.error("Error executing play:", error);
+    throw error;
+  }
+};
+
+// Weekly Plan generation
+export interface WeeklyPlanInput {
+  pillars: Pillar[];
+  topPerformingContent: Execution[];
+  platformMix: Platform[];
+  postsPerWeek: number;
+}
+
+export interface GeneratedPlan {
+  posts: Omit<PlannedPost, 'id' | 'status' | 'executionId'>[];
+  insights: string;
+}
+
+export const generateWeeklyPlan = async (
+  input: WeeklyPlanInput,
+  settings: UserSettings
+): Promise<GeneratedPlan> => {
+  const ai = getAiClient(settings);
+  if (!ai) throw new Error("API Key not configured. Add your Gemini API key in Settings.");
+
+  // Prepare top performing content summary
+  const topContentSummary = input.topPerformingContent
+    .slice(0, 10)
+    .map(e => ({
+      platform: e.platform,
+      score: e.performanceScore,
+      snippet: e.content.slice(0, 200),
+      pillarId: e.pillarId,
+    }));
+
+  // Prepare pillar summaries
+  const pillarSummary = input.pillars.map(p => ({
+    id: p.id,
+    title: p.title,
+    coreIdea: p.coreIdea,
+    themes: p.themes,
+  }));
+
+  const prompt = `You are a content strategist creating a weekly content plan.
+
+AVAILABLE PILLARS:
+${JSON.stringify(pillarSummary, null, 2)}
+
+TOP PERFORMING CONTENT (for style/topic inspiration):
+${JSON.stringify(topContentSummary, null, 2)}
+
+PLATFORM MIX TO USE: ${input.platformMix.join(', ')}
+TARGET POSTS THIS WEEK: ${input.postsPerWeek}
+
+VOICE/TONE: ${settings.globalVoice}
+
+Create a weekly content plan that:
+1. Distributes posts strategically across the week (0=Sunday, 1=Monday, etc.)
+2. Balances different pillars and themes
+3. Uses insights from top-performing content to inform hooks and angles
+4. Varies the platforms according to the platform mix
+5. Provides a compelling hook (opening line) for each post
+6. Explains the reasoning behind each post's timing and angle
+
+Also provide overall insights about the plan - what themes are emphasized, any strategic recommendations, etc.`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: settings.model,
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            posts: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  dayOfWeek: { type: Type.NUMBER },
+                  platform: { type: Type.STRING, enum: ['linkedin', 'twitter', 'newsletter', 'youtube', 'instagram'] },
+                  pillarId: { type: Type.STRING },
+                  hook: { type: Type.STRING },
+                  angle: { type: Type.STRING },
+                  reasoning: { type: Type.STRING },
+                },
+                required: ['dayOfWeek', 'platform', 'pillarId', 'hook', 'angle', 'reasoning'],
+              },
+            },
+            insights: { type: Type.STRING },
+          },
+          required: ['posts', 'insights'],
+        },
+      },
+    });
+
+    const text = response.text;
+    if (!text) return { posts: [], insights: '' };
+    return JSON.parse(text);
+  } catch (error) {
+    console.error("Error generating weekly plan:", error);
     throw error;
   }
 };

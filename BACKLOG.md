@@ -6,7 +6,7 @@
 |-------|-------|--------|
 | V1.0 | Core MVP (current) | ✅ Complete |
 | V1.1 | Plays System | ✅ Complete |
-| V1.2 | Strategy Copilot | 🔲 Planned |
+| V1.2 | Strategy Copilot | ✅ Complete |
 | V2.0 | Integrations & Play Builder | 🔲 Future |
 
 ---
@@ -219,8 +219,33 @@ NEWSLETTER (Sunday)
 
 ---
 
+## V1.2 Implementation Notes
+
+### Strategy Copilot Features Completed
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Performance Metrics Types | ✅ | `PerformanceMetrics` and `performanceScore` on Executions |
+| CSV Import (LinkedIn) | ✅ | Parses analytics CSV, matches to executions, computes scores |
+| CSV Import (Kit/Newsletter) | ✅ | Open rate, click rate, unsubscribes |
+| Weekly Plan Generator | ✅ | AI-powered planning with pillar balancing |
+| Plan Review UI | ✅ | Calendar + list view, draft from planned posts |
+| Plan Persistence | ✅ | LocalStorage for weekly plans |
+| Notion MCP Integration | 🔲 | Deferred to V2.0 |
+
+### V2.0 Scope (Future)
+
+- Notion MCP integration for idea capture
+- Play Builder (custom play creation)
+- Play sharing/importing
+- Calendar integration for scheduling
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
 | 0.0.0 | 2025-11-22 | Initial MVP - 3-pane architecture, Gemini integration, keyboard navigation |
+| 0.1.0 | 2025-12-25 | V1.1 Plays System - 3 built-in plays, play execution modal |
+| 0.2.0 | 2025-12-25 | V1.2 Strategy Copilot - CSV import, weekly planning, plan review |

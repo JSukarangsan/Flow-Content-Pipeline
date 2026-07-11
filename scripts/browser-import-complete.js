@@ -1,0 +1,544 @@
+/**
+ * Browser Console Import Script
+ * Copy and paste this entire script into the browser console while on http://localhost:3000
+ */
+
+// The import data from Evissa
+const importData = {
+  "timestamp": "2026-03-16T21:45:17.966Z",
+  "ideas": [
+  {
+    "title": "The 10/20/70 rule of AI implementation nobody follows",
+    "coreIdea": "Research confirms successful AI implementations spend 10% on algorithms, 20% on infrastructure, and 70% on people and process. Most orgs invert this — 80% on the tool, 15% on implementation, 5% hoping adoption happens. The primary value-creating activity isn't teaching people AI tools (89% already use them) — it's building the context layer that makes tools produce trustworthy output.\n\nKey Concepts:\n- ⚡ The 10/20/70 split: algorithms/infrastructure/people-and-process — validated by successful AI deployments\n- ⚡ The inversion pattern: 80% on tools, 15% on implementation, 5% on adoption hope\n- ⚡ 89% of knowledge workers already use AI — adoption is not the blocker\n- ⚡ The primary value-creating activity: building context infrastructure, not running training sessions\n- ⚡ \"People and process\" isn't soft — it's the structural work of embedding AI into actual workflows\n- ⚡ The training trap: teaching prompting skills to people who already use the tools doesn't move the confidence needle\n- ⚡ What the 70% actually covers: workflow redesign, context infrastructure, governance, quality standards\n- ⚡ Budget allocation as a signal: where you spend reveals your mental model of the problem",
+    "topic": "Strategy",
+    "tags": [
+      "pilot-purgatory",
+      "ai-implementation",
+      "change-management"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/10-20-70-rule-ai-implementation-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "10-20-70-rule-ai-implementation-idea.md"
+  },
+  {
+    "title": "How I use AI to prep for a meeting I don't have time to prep for",
+    "coreIdea": "The real workflow, not the idealized one. 15 minutes before a meeting, with a project context directory, you ask AI: \"Based on the project context, decision log, and last week's notes, give me the 3 things I need to walk in knowing and the 2 open questions I should raise.\" That's the entire prompt. It works because the context directory exists. Without it, you'd spend those 15 minutes searching Slack.\n\nKey Concepts:\n- ⚡ The realistic scenario: back-to-back calendar, 15 minutes before the meeting, no prep time planned\n- ⚡ The exact prompt: \"Based on project context, decision log, and last week's notes, give me 3 things I need to know and 2 questions I should raise\"\n- ⚡ The prompt works because the context exists — without the directory, the same prompt returns generic output\n- ⚡ Without context infrastructure: 15 minutes of Slack searching, still walking in under-prepared\n- ⚡ With context infrastructure: 3-minute prep that synthesizes the last 4 weeks of project context\n- ⚡ The output format: 3 bullets for situational awareness + 2 open questions to raise — actionable, not overwhelming\n- ⚡ Meeting note → context update as a post-meeting practice: feeding the meeting output back into the project directory\n- ⚡ The accumulation effect: every meeting that gets captured makes the next meeting prep faster and more accurate",
+    "topic": "Strategy",
+    "tags": [
+      "context-engineering",
+      "build-in-public",
+      "practices",
+      "workflow"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/ai-meeting-prep-15-minutes-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "ai-meeting-prep-15-minutes-idea.md"
+  },
+  {
+    "title": "The AI org chart is changing — roles nobody's hiring for yet",
+    "coreIdea": "Gartner recommends dedicated Context Engineers and Context Architects. Cognizant deployed 1,000 context engineers. New roles are emerging: AI Ops Managers, AI Product Owners, AI Ethics Officers. But most orgs still try to make \"everyone should use AI\" work without dedicated infrastructure people — the design system analogy makes this concrete: nobody expects every designer to maintain the design system, you need a small team that maintains infrastructure while everyone else uses it.\n\nKey Concepts:\n- ⚡ Gartner: dedicated Context Engineers and Context Architects are the missing org design investment\n- ⚡ Cognizant deployed 1,000 context engineers — this is real, not theoretical\n- ⚡ Emerging roles: AI Ops Manager, AI Product Owner, Context Architect, AI Ethics Officer\n- ⚡ Most orgs have no dedicated AI infrastructure role — the gap between \"everyone uses AI\" and \"someone owns AI infrastructure\"\n- ⚡ The design system analogy: designers use the design system, a small team maintains it — same model applies to context infrastructure\n- ⚡ Role confusion: conflating AI tool usage (distributed) with AI infrastructure ownership (centralized) leads to no one owning either well\n- ⚡ The infrastructure owner ensures consistency, quality floors, and context that benefits everyone — not just their own team\n- ⚡ First-mover advantage: orgs that define these roles now will have accumulated institutional AI knowledge when others are starting from scratch",
+    "topic": "Strategy",
+    "tags": [
+      "agent-sprawl",
+      "org-design",
+      "ai-roles",
+      "context-engineering"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/ai-org-chart-new-roles-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "ai-org-chart-new-roles-idea.md"
+  },
+  {
+    "title": "How I'd set up an AI pilot that actually ships (not just demos)",
+    "coreIdea": "Design it as a production rehearsal, not an experiment. Build context infrastructure first, not after. Measure confidence and output quality, not adoption rates. Include skeptics in pilot design. Define \"done\" as \"the workflow changed,\" not \"people used the tool.\" This is the counter-programming to every \"30-day AI pilot\" playbook that leads to pilot purgatory.\n\nKey Concepts:\n- ⚡ The design brief difference: \"production rehearsal\" vs. \"experiment\" — different intent produces radically different designs\n- ⚡ Context infrastructure comes first: build the project directory, decision log, and role configs before anyone touches the tools\n- ⚡ What to measure: output quality scores, confidence ratings, time on value-added work (not adoption percentages)\n- ⚡ Include skeptics in pilot design — not as subjects, as co-designers. Their constraints make the pilot more robust\n- ⚡ \"Done\" definition: the workflow has durably changed — not \"94% of people tried the tool at least once\"\n- ⚡ Real data, real integrations, real edge cases — curated data pilots test the demo, not the deployment\n- ⚡ The skeptic's role in the pilot: surface failure modes before they reach production (this is valuable, not obstructionist)\n- ⚡ Handoff design: the pilot should produce the exact context artifacts needed for production deployment",
+    "topic": "Strategy",
+    "tags": [
+      "pilot-purgatory",
+      "ai-implementation",
+      "tactical"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/ai-pilot-that-ships-not-demos-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "ai-pilot-that-ships-not-demos-idea.md"
+  },
+  {
+    "title": "The AI readiness audit I run before any engagement",
+    "coreIdea": "What to measure: adoption breadth vs. depth, confidence scores by role, context delivery methods (manual paste vs. structured infrastructure), documentation maturity, handoff friction, and time spent on coordination vs. creation. These answers tell you more about AI readiness than any maturity model checklist — and the value is knowing what to do with the answers.\n\nKey Concepts:\n- ⚡ Adoption breadth (% using AI) is table stakes — adoption depth (how they use it, for what) is the signal\n- ⚡ Confidence scores by role reveal calibration gaps — high confidence + new hire is a governance risk, not a win\n- ⚡ Context delivery method is the most revealing question: do people paste documents manually or do tools receive structured context?\n- ⚡ Documentation maturity: not formal process docs, but the percentage of actual working knowledge that's externalized anywhere\n- ⚡ Handoff friction metric: how many hours per handoff are spent recreating context that already exists somewhere?\n- ⚡ Time split: what percentage of their day is coordination/reassembly vs. actual value-creating work?\n- ⚡ The audit output: a ranked list of structural problems sorted by impact, not a maturity level or a tool recommendation\n- ⚡ Making the IP public is a strategy, not a giveaway — the value is knowing what to do with the findings",
+    "topic": "Strategy",
+    "tags": [
+      "ai-readiness",
+      "audit-framework",
+      "tactical",
+      "consulting"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/ai-readiness-audit-framework-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "ai-readiness-audit-framework-idea.md"
+  },
+  {
+    "title": "You're using AI to automate a broken process. That's not transformation.",
+    "coreIdea": "55% of companies cite outdated manual processes as their biggest AI hurdle. When you digitize a broken process, AI accelerates the production of bad outcomes. The exec review process wasn't slow because people lacked AI tools — it was slow because context had to be reassembled from scratch every cycle. AI could make the deck faster. But why was the deck necessary in the first place?\n\nKey Concepts:\n- ⚡ 55% of companies say outdated manual processes are their biggest AI obstacle (not models, not data)\n- ⚡ Automating a broken process doesn't fix it — it makes the broken output arrive faster\n- ⚡ The exec review example: AI can generate the deck 5x faster, but the deck exists because context wasn't captured\n- ⚡ First-order AI use: \"do this task faster\" — Second-order AI use: \"why does this task exist?\"\n- ⚡ Process redesign question: if context was always available, would this workflow even exist in its current form?\n- ⚡ The acceleration trap: speed improvement on a broken process masks the structural problem while entrenching it\n- ⚡ True transformation = AI changes what work is done, not just how fast current work gets done\n- ⚡ The uncomfortable question: which of your current workflows would you redesign from scratch if starting today?",
+    "topic": "Strategy",
+    "tags": [
+      "process-redesign",
+      "workflow-transformation",
+      "ai-strategy"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/automating-broken-process-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "automating-broken-process-idea.md"
+  },
+  {
+    "title": "The CLAUDE.md file that turns a generic AI into your team's AI",
+    "coreIdea": "Walk through building a CLAUDE.md (or equivalent system instructions file) that encodes your team's actual context: what you're building, who your users are, your constraints, decisions already made, and your quality bar. Show the structure, what goes in each section, and the output difference between a vanilla prompt and one backed by a well-built context file. This is the atomic unit of context engineering and anyone can try it today.\n\nKey Concepts:\n- ⚡ The CLAUDE.md (or equivalent) is the single file that transforms a generic AI into a team-specific tool\n- ⚡ What belongs in each section: product context / user context / technical constraints / quality standards / decisions already made / what to never do\n- ⚡ The \"never do\" section is often the most valuable — it encodes the lessons learned from past mistakes\n- ⚡ The output comparison: same prompt, with and without CLAUDE.md — show the actual quality difference, not a description of it\n- ⚡ Works for every AI tool: Claude names it CLAUDE.md, Cursor uses .cursorrules, Gemini has system prompts — same concept, different file names\n- ⚡ Team context file vs. personal context file — the team version ensures everyone's AI sessions start from the same baseline\n- ⚡ The file is living: it should update every time a new constraint is discovered or a new decision is made\n- ⚡ The atomic unit framing: if you build one thing for AI context infrastructure, this is the file to start with",
+    "topic": "Strategy",
+    "tags": [
+      "context-engineering",
+      "build-in-public",
+      "practices",
+      "claude-code"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/claude-md-team-context-file-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "claude-md-team-context-file-idea.md"
+  },
+  {
+    "title": "The literal file structure of a context kit",
+    "coreIdea": "Make context engineering tangible with a concrete file structure: project.md, decisions.md, constraints.md, research/, design/, engineering/, roles/, handoffs/, meta/. Plain-text markdown. Vendor-agnostic. Works with Claude, Cursor, Gemini, Copilot, whatever comes next. Every AI tool reads the same structured context instead of each person pasting documents into chat.\n\nKey Concepts:\n- ⚡ The actual directory structure: project.md / decisions.md / constraints.md / research/ / design/ / engineering/ / roles/ / handoffs/ / meta/\n- ⚡ Plain-text markdown: intentionally vendor-agnostic, works with every current and future AI tool\n- ⚡ Before state: open tool → paste 4 docs → explain context → get output → repeat for next tool (daily friction)\n- ⚡ After state: open tool → it already knows everything → start working immediately\n- ⚡ Tool-specific config files: .cursorrules tells Cursor what to do, claude.md tells Claude how to behave, figma-make-guide.md tells Figma what's in scope\n- ⚡ Shared context means every teammate's AI sessions start from the same baseline — no drift, no context gaps\n- ⚡ The build cost: 30-45 minutes upfront, pays back within the first week of using it\n- ⚡ Show the actual file contents: what a decisions.md looks like after 3 weeks of use, not the theoretical template",
+    "topic": "Strategy",
+    "tags": [
+      "context-engineering",
+      "context-infrastructure",
+      "tactical",
+      "build-in-public"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/context-kit-file-structure-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "context-kit-file-structure-idea.md"
+  },
+  {
+    "title": "3 Cursor rules that saved our design-to-code workflow",
+    "coreIdea": "Three specific .cursorrules entries that made a measurable difference: (1) a rule that forces Cursor to use existing components from a Storybook reference before creating new ones, (2) a rule that requires accessibility attributes on all interactive elements, (3) a rule that specifies the team's actual CSS/styling conventions. Not \"Cursor is great\" — instead: \"These three lines of text changed the quality floor of every AI-generated prototype.\"\n\nKey Concepts:\n- ⚡ Rule 1: \"Before creating any component, check /storybook-reference.md for existing components that meet this requirement\" — stops component sprawl\n- ⚡ Rule 2: \"All interactive elements must include appropriate ARIA attributes and keyboard navigation support\" — accessibility becomes the default, not the afterthought\n- ⚡ Rule 3: \"Use [team's CSS variables] for all colors, spacing, and typography — never hardcode values\" — consistency without manual review\n- ⚡ Quality floor concept: rules don't make the ceiling higher, they raise the floor — every generated output meets minimum standards\n- ⚡ The \"three lines of text changed quality\" framing: this is about text in a config file, not a new tool or a complex workflow\n- ⚡ The multiplier effect: each rule applies to every AI generation in the project — the leverage is enormous\n- ⚡ What's missing from most .cursorrules: team-specific conventions that are \"obvious\" to the team but invisible to the AI\n- ⚡ Make it shareable: include the actual text of each rule, not descriptions of what the rules should achieve",
+    "topic": "Strategy",
+    "tags": [
+      "cursor",
+      "build-in-public",
+      "practices",
+      "design-to-code"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/cursor-rules-design-to-code-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "cursor-rules-design-to-code-idea.md"
+  },
+  {
+    "title": "The decision log that pays for itself in 2 weeks",
+    "coreIdea": "One markdown file. After every meeting where a decision gets made, append: what was decided, why, what was considered and rejected, who was in the room. Takes 3 minutes. Two weeks in, when someone asks \"why did we go with approach X?\" you don't schedule a meeting — you point to line 47. When AI tools need project context, the decision log is the single highest-value file you can feed them.\n\nKey Concepts:\n- ⚡ The exact format: what was decided → why → what was rejected and why → who was present → date\n- ⚡ Time cost: 3 minutes per decision, immediately after the meeting while context is fresh\n- ⚡ The compound return: each entry adds context that makes every future AI session more accurate and org-specific\n- ⚡ The \"why did we go with X?\" moment: instead of scheduling a 30-minute meeting, you point to a line number\n- ⚡ AI tool value: feed the entire decision log to Claude, Cursor, or any tool — it immediately understands your constraints and past choices\n- ⚡ The rejected options are often more valuable than the chosen ones — they define the constraints future decisions inherit\n- ⚡ Onboarding transformation: a new team member with the decision log understands 6 months of context in one read\n- ⚡ The plain text format means it works with every AI tool — no integration, no setup, no vendor lock-in",
+    "topic": "Strategy",
+    "tags": [
+      "context-engineering",
+      "build-in-public",
+      "practices",
+      "knowledge-management"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/decision-log-that-compounds-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "decision-log-that-compounds-idea.md"
+  },
+  {
+    "title": "95% of enterprise AI projects fail — not because of the AI",
+    "coreIdea": "MIT found a 95% failure rate for enterprise GenAI projects — but the failure isn't model quality or data readiness. Organizations deploy AI tools without connecting them to organizational context, and an org with 89% tool adoption and 5.3/10 confidence won't improve by adding a 10th tool.\n\nKey Concepts:\n- ⚡ 95% enterprise GenAI failure rate (MIT) — widely cited, rarely explained correctly\n- ⚡ The failure mode isn't the model — it's the missing organizational context layer\n- ⚡ 89% tool adoption + 5.3/10 confidence = the doom loop more tools won't fix\n- ⚡ Every new tool deployed cold starts from zero — no memory of past decisions, no org-specific constraints\n- ⚡ Context infrastructure is what makes tools produce trustworthy, org-specific output\n- ⚡ The 5% of companies seeing real returns invest in context that persists across tools\n- ⚡ Adding a 10th seat to a broken context problem accelerates the wrong outcomes\n- ⚡ Shared context infrastructure is the actual lever — not model upgrades or prompt training",
+    "topic": "Strategy",
+    "tags": [
+      "roi-reckoning",
+      "enterprise-ai",
+      "context-infrastructure"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/enterprise-ai-failure-context-gap-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "enterprise-ai-failure-context-gap-idea.md"
+  },
+  {
+    "title": "The 5 questions every AI strategy should answer (and most don't)",
+    "coreIdea": "The five questions: 1) Where does context die in your org? 2) What knowledge lives only in people's heads? 3) Which workflows should change, not just get faster? 4) Who owns AI infrastructure vs. who uses it? 5) How will you know if AI is working — and for whom? These are organizational questions, not technology questions. That's the point.\n\nKey Concepts:\n- ⚡ Q1: Where does context die? — The handoffs, meetings, and transitions where structured information becomes verbal, then disappears\n- ⚡ Q2: What knowledge lives only in heads? — The undocumented institutional knowledge that AI can't access and agents can't use\n- ⚡ Q3: Which workflows should change, not just get faster? — The \"why does this task exist?\" question applied to each workflow\n- ⚡ Q4: Who owns AI infrastructure vs. who uses it? — The design system analogy: builders vs. users are different roles\n- ⚡ Q5: How will you know if AI is working — and for whom? — Defining success metrics before deployment, not after\n- ⚡ None of these are technology questions — that's deliberate. Technology answers the \"how\" — these questions define the \"what\" and \"why\"\n- ⚡ Most AI strategies answer Q4 and skip Q1, Q2, Q3 entirely — the sequence matters\n- ⚡ The org that can answer all 5 clearly doesn't need a tool — they need execution. Most orgs can't answer any of them.",
+    "topic": "Strategy",
+    "tags": [
+      "ai-strategy",
+      "framework",
+      "tactical"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/five-questions-every-ai-strategy-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "five-questions-every-ai-strategy-idea.md"
+  },
+  {
+    "title": "The handoff doc that writes itself",
+    "coreIdea": "When project context lives in structured files, generating a handoff doc becomes an AI task, not a human task. PM→Design: AI reads project.md + decisions.md + constraints.md and generates a structured brief with edge cases, scope boundaries, and open questions. Design→Engineering: AI reads design decisions + component inventory + accessibility requirements and generates implementation context. Show the prompt, the input files, the output.\n\nKey Concepts:\n- ⚡ The handoff doc bottleneck: traditionally takes 1-3 hours to write well, often skipped because of time pressure\n- ⚡ Context infrastructure prerequisite: the handoff generates itself only because the structured files already exist\n- ⚡ PM→Design handoff: project.md + decisions.md + constraints.md → AI generates brief with edge cases, scope, open questions\n- ⚡ Design→Engineering handoff: design decisions + component inventory + a11y requirements → implementation context doc\n- ⚡ The prompt is simple because the context is rich — not the reverse\n- ⚡ Quality floor improvement: AI-generated handoffs surface edge cases and constraints humans overlook in the rush to hand off\n- ⚡ The flywheel: good handoffs mean fewer back-and-forth questions, which means fewer context gaps, which means better future handoffs\n- ⚡ Show the actual prompt + input + output: make this concrete enough that someone can copy it today",
+    "topic": "Strategy",
+    "tags": [
+      "context-engineering",
+      "build-in-public",
+      "practices",
+      "workflow"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/handoff-doc-writes-itself-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "handoff-doc-writes-itself-idea.md"
+  },
+  {
+    "title": "Don't lead with speed. Lead with quality.",
+    "coreIdea": "67% of one assessed org cited quality risk as their top AI concern. Every vendor pitch says \"faster.\" The people doing the work say \"I'm worried it'll be worse.\" Forrester found trust and governance are now the primary adoption blockers, not access or training. The orgs that frame AI as \"more reliable with verification\" outperform the ones that frame it as \"faster without oversight.\"\n\nKey Concepts:\n- ⚡ 67% of knowledge workers cite quality degradation as their primary AI concern — not privacy, not job security\n- ⚡ The speed pitch is the standard vendor narrative — it's not the conversation that moves the silent middle\n- ⚡ Forrester: trust and governance have overtaken access and training as the primary adoption blockers\n- ⚡ The fear underneath the concern: \"AI will make me look bad, not just slow me down\"\n- ⚡ \"More reliable with verification\" reframes AI as a quality improvement, not a speed trade-off\n- ⚡ Quality-led framing: show error-catching, consistency, and review workflows first — save speed metrics for later\n- ⚡ The people most worried about quality are often the highest performers — and their adoption signals trust to the entire team\n- ⚡ Governance as enablement: clear review standards and AI usage policies actually increase adoption among quality-conscious users",
+    "topic": "Strategy",
+    "tags": [
+      "ai-adoption",
+      "trust",
+      "quality",
+      "field-report"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/lead-with-quality-not-speed-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "lead-with-quality-not-speed-idea.md"
+  },
+  {
+    "title": "The new hire most confident with AI might be your biggest risk",
+    "coreIdea": "New employees arrive with AI fluency but without institutional context. Their high confidence doesn't account for org-specific quality standards they haven't internalized. This is a calibration problem, not an adoption problem. And it scales dangerously with agents: an agent built by someone who doesn't understand the org's constraints will confidently produce the wrong thing at scale.\n\nKey Concepts:\n- ⚡ AI fluency and institutional knowledge are two different forms of competence — both are required for safe AI use\n- ⚡ New hires arrive with high AI confidence but without the org-specific constraints that experienced employees have internalized\n- ⚡ This is a calibration gap: their AI output quality looks fine on the surface but violates standards they don't yet know exist\n- ⚡ High confidence + missing context = the failure mode that's hardest to catch before it ships\n- ⚡ The agent amplification problem: an agent built by someone with context gaps will produce confident, wrong output at scale\n- ⚡ Org-specific quality standards are rarely documented — they live in the heads of senior contributors\n- ⚡ The fix: context infrastructure that externalizes the institutional knowledge new hires are missing\n- ⚡ Calibration exercise: give a new hire and a senior contributor the same AI task — the delta in output reveals your context gap",
+    "topic": "Strategy",
+    "tags": [
+      "ai-adoption",
+      "governance",
+      "field-report",
+      "context-engineering"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/new-hire-ai-confidence-risk-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "new-hire-ai-confidence-risk-idea.md"
+  },
+  {
+    "title": "The pilot that never ships has the same root cause every time",
+    "coreIdea": "McKinsey's most underreported finding: of 25 attributes tested, workflow redesign had the largest effect on EBIT impact — not the model, not prompt quality, not the tool. Two teams with identical access: one at 71% daily AI use, one at 14%. The variable wasn't access or training — it was whether leadership signaled the work should change, not just the tools.\n\nKey Concepts:\n- ⚡ McKinsey: workflow redesign outperformed all 24 other attributes in driving EBIT impact from AI\n- ⚡ Same org, same tools, same access — 71% daily use vs. 14% daily use between two teams\n- ⚡ The variable: whether leadership signaled \"the work changes\" not just \"the tools change\"\n- ⚡ Most AI rollouts are permission-based: \"you can use this tool\" vs. expectation-based: \"here's how we work now\"\n- ⚡ Tool deployment without workflow signal creates optional adoption — and optional adoption is low adoption\n- ⚡ The EBIT finding reframes AI ROI as an ops/leadership problem, not a technology problem\n- ⚡ Workflow redesign is not a consulting deliverable — it's the ongoing operating system change\n- ⚡ Signs leadership has signaled correctly: work outputs change, not just tool usage metrics",
+    "topic": "Strategy",
+    "tags": [
+      "pilot-purgatory",
+      "workflow-redesign",
+      "ai-adoption"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/pilot-never-ships-workflow-redesign-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "pilot-never-ships-workflow-redesign-idea.md"
+  },
+  {
+    "title": "Your AI pilot succeeded. That's the problem.",
+    "coreIdea": "The most common path to pilot purgatory isn't a failed pilot — it's a misleadingly successful one. The demo worked. The pilot team loved it. But it was designed as an experiment, not a deployment: data was curated, team was hand-picked, integrations were mocked. The critical design decision is to treat the pilot as a production rehearsal and build context infrastructure first.\n\nKey Concepts:\n- ⚡ Pilot purgatory often starts with a successful pilot — the success was the trap\n- ⚡ Experimental design vs. production rehearsal design — these are fundamentally different briefs\n- ⚡ Curated data, hand-picked teams, mocked integrations: the three signs your pilot was a demo\n- ⚡ \"The team loved it\" is not a production signal — it's an enthusiasm signal\n- ⚡ Context infrastructure built during the pilot is the asset that survives into production\n- ⚡ Real pilots test: handoffs, edge cases, context gaps, quality floors, skeptic behavior\n- ⚡ The pivot: reframe pilot success criteria from \"did people use it?\" to \"did the workflow change?\"\n- ⚡ Most AI pilots are designed to show potential — production requires proving reliability",
+    "topic": "Strategy",
+    "tags": [
+      "pilot-purgatory",
+      "ai-implementation",
+      "production-readiness"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/pilot-success-is-the-problem-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "pilot-success-is-the-problem-idea.md"
+  },
+  {
+    "title": "How to present AI findings to a leader who's heard it all",
+    "coreIdea": "Don't lead with capabilities. Lead with their own data. Show them the cost of the current state, not the promise of the future state. The CTO didn't react to \"AI can help with reviews\" — he reacted to \"your PMs spend 10 hours per review cycle reassembling context that was never captured in the first place.\" Use their pain as the entry point. Let them ask for the solution.\n\nKey Concepts:\n- ⚡ Every executive has heard the AI capabilities pitch — it no longer generates curiosity, it generates skepticism\n- ⚡ Their own data is the only data that can't be dismissed: \"our PMs, our process, our hours\"\n- ⚡ The reframe: current state cost vs. future state promise — one is their problem, one is your solution\n- ⚡ The CTO reaction sequence: capability pitch → polite nod → move on; diagnostic pitch → lean forward → ask questions\n- ⚡ \"Why is the work structured this way?\" is the question you want them asking — it means they've accepted the problem\n- ⚡ The entry point is always their pain, not your insight — let them tell you it's a problem before you tell them the solution\n- ⚡ The diagnostic forces investment: they contributed the data, so they own the implication\n- ⚡ Tactical structure: 1 slide with their hours/cost, 1 slide with the structural cause, 0 slides on AI capabilities",
+    "topic": "Strategy",
+    "tags": [
+      "executive-communication",
+      "ai-strategy",
+      "tactical",
+      "field-report"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/presenting-ai-findings-to-leaders-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "presenting-ai-findings-to-leaders-idea.md"
+  },
+  {
+    "title": "I watched the ROI conversation change in real time",
+    "coreIdea": "The presentation that landed wasn't \"AI can do X.\" It was \"your teams spend Y hours on Z because of a structural problem.\" When you show a CTO that 70% of PMs spend 5+ hours per exec review hunting for context that should already exist, the conversation shifts from \"what AI tool should we buy\" to \"why is the work structured this way.\" Frame your AI pitch as a diagnostic, not a solution.\n\nKey Concepts:\n- ⚡ The AI capability pitch (\"here's what AI can do\") lands as a demo, not a decision\n- ⚡ The diagnostic pitch (\"here's the structural problem costing your team X hours\") lands as a business case\n- ⚡ Real example: 70% of PMs, 5+ hours per exec review cycle, reassembling context that was never captured\n- ⚡ The conversation pivot: from \"what tool should we buy?\" to \"why is the work structured this way?\"\n- ⚡ Using their own data — not benchmarks, not case studies — is what shifts exec posture from skeptical to curious\n- ⚡ The diagnostic frame makes the CTO a co-investigator, not an audience member\n- ⚡ \"What's the cost of the current state?\" is a more powerful entry point than \"what's the ROI of the future state?\"\n- ⚡ Field observation: every executive has a number in their head for how long something takes — surfacing it with data makes the pain undeniable",
+    "topic": "Strategy",
+    "tags": [
+      "roi-reckoning",
+      "field-report",
+      "ai-strategy",
+      "executive-communication"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/roi-conversation-shift-real-time-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "roi-conversation-shift-real-time-idea.md"
+  },
+  {
+    "title": "Search is not context. Here's why that distinction matters.",
+    "coreIdea": "Enterprise search (Glean, Guru, Confluence) helps you find documents. Context infrastructure assembles, scopes, and delivers the right information to the right tool at the right time. Two people searching for the same thing get different results. Context ensures everyone starts from the same baseline. \"We have Glean\" doesn't solve the AI value problem — and this category distinction most leaders haven't made yet explains why.\n\nKey Concepts:\n- ⚡ Search = you go find information when you need it; Context = the right information is already there when you start working\n- ⚡ Enterprise search tools (Glean, Guru, Confluence) are retrieval tools — they don't deliver structured context to AI workflows\n- ⚡ The same search query returns different results for different people — context infrastructure eliminates that variability\n- ⚡ Context scoping: not all information is relevant to every task — context infrastructure filters and assembles the right subset\n- ⚡ \"We have Glean\" is the category error response to an AI context problem — they solve different problems\n- ⚡ Shared context baseline: everyone on a team starting from the same structured information vs. everyone reassembling their own\n- ⚡ AI tools that receive assembled context produce more consistent, org-specific outputs than tools receiving search results\n- ⚡ The category hasn't been named by vendors yet — which means the distinction is an education opportunity, not a product pitch",
+    "topic": "Strategy",
+    "tags": [
+      "context-engineering",
+      "context-infrastructure",
+      "enterprise-ai"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/search-vs-context-infrastructure-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "search-vs-context-infrastructure-idea.md"
+  },
+  {
+    "title": "The skeptics aren't your problem. The silent middle is.",
+    "coreIdea": "Every org has loud AI enthusiasts and visible skeptics. But 42% of one assessed org said \"I see potential, but only for specific, low-risk tasks.\" These people aren't resistant — they're unconvinced. They need evidence, not evangelism. They need to see ONE workflow get demonstrably better. Most AI champions spend all their energy on skeptics and ignore the persuadable majority.\n\nKey Concepts:\n- ⚡ The adoption pyramid has three segments: enthusiasts (visible), skeptics (visible), and the silent middle (majority, often ignored)\n- ⚡ 42% of a real assessed org was in the \"I see potential, but only for low-risk tasks\" category — unconvinced, not resistant\n- ⚡ Unconvinced and resistant require completely different interventions — most AI programs treat them the same way\n- ⚡ The silent middle moves on evidence, not evangelism — one workflow improvement beats 10 capability demonstrations\n- ⚡ Most AI champions are spending 80% of their energy on the 15% who are actively skeptical\n- ⚡ The persuadable majority is the leverage point — moving them shifts the whole adoption curve\n- ⚡ What moves the silent middle: seeing someone *like them* succeed with AI in their *specific workflow*\n- ⚡ The AI champion's reallocation: less time on skeptic conversion, more time identifying and amplifying silent-middle success stories",
+    "topic": "Strategy",
+    "tags": [
+      "ai-adoption",
+      "change-management",
+      "field-report"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/silent-middle-not-skeptics-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "silent-middle-not-skeptics-idea.md"
+  },
+  {
+    "title": "Only 17% of teams have documentation that's complete and followed",
+    "coreIdea": "Any AI system that relies on documented workflows will have massive gaps. Only 17% of teams have documentation that is both complete and actually followed. Most organizations' most valuable knowledge lives in people's heads, not in any indexed system. The real \"data readiness\" problem isn't dirty databases — it's unexternalized human knowledge. The first step of AI transformation isn't tool deployment. It's knowledge externalization.\n\nKey Concepts:\n- ⚡ 17% of teams have documentation that's complete and followed — the other 83% are running on tribal knowledge\n- ⚡ The real data readiness problem: not database quality, but the vast unindexed knowledge that exists only in people's heads\n- ⚡ AI tools that rely on documented processes inherit all the documentation gaps — which means most orgs\n- ⚡ Tribal knowledge: the most valuable institutional knowledge is the hardest to extract and the first to be lost\n- ⚡ The externalization gap: knowledge that's in someone's head provides zero value to an AI tool\n- ⚡ \"Documentation\" in AI context doesn't mean process docs — it means any structured, accessible representation of how decisions get made\n- ⚡ The first-mover advantage: orgs that invest in knowledge externalization before deploying agents will have dramatically better agent outputs\n- ⚡ Practical externalization: structured decision logs, constraint files, annotated examples — not formal documentation systems",
+    "topic": "Strategy",
+    "tags": [
+      "knowledge-management",
+      "context-engineering",
+      "field-report",
+      "ai-readiness"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/tribal-knowledge-documentation-gap-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "tribal-knowledge-documentation-gap-idea.md"
+  },
+  {
+    "title": "Workflow redesign isn't a consulting project. It's the actual AI strategy.",
+    "coreIdea": "HBS says AI is shifting from isolated tools people can choose to adopt, to platforms that sit at the center of workflows, decisions, and customer journeys. The people who understand workflows — ops leaders, PgMs, heads of product ops — are suddenly the most important people in the AI strategy. Not the ML team, not data scientists. The people who understand how work actually gets done across team boundaries.\n\nKey Concepts:\n- ⚡ HBS finding: AI is no longer a tool layer — it's moving to the center of workflows, decisions, and customer journeys\n- ⚡ The power shift: workflow experts (ops, PgMs, product ops) are now the critical AI strategy roles\n- ⚡ ML teams and data scientists built the last era's AI advantage — workflow owners will define this era's\n- ⚡ Cross-team workflow visibility is the rare asset — most AI tools optimize within a team, not across them\n- ⚡ The consulting framing trap: \"workflow redesign\" sounds like a one-time project — it's actually the continuous operating model\n- ⚡ Organizations are now splitting into those whose workflows are AI-native vs. those who added AI to existing workflows\n- ⚡ Ops leaders who can map where context dies across team handoffs are doing more for AI ROI than anyone buying seats\n- ⚡ The strategic question: who in your org has both workflow authority and AI fluency? That person is your highest-leverage AI hire/investment right now.",
+    "topic": "Strategy",
+    "tags": [
+      "process-redesign",
+      "ai-strategy",
+      "workflow-transformation"
+    ],
+    "source": {
+      "type": "evissa",
+      "title": "content-strategy-v2.md",
+      "url": "evissa://ideas/workflow-redesign-is-ai-strategy-idea.md"
+    },
+    "hooks": [],
+    "audience": [],
+    "created": "2026-03-16T00:00:00.000Z",
+    "originalFile": "workflow-redesign-is-ai-strategy-idea.md"
+  }
+]
+};
+
+// Function to import ideas
+async function importEvissaIdeas() {
+  console.log('🚀 Starting Evissa ideas import...');
+
+  try {
+    // Open the IndexedDB
+    const request = indexedDB.open('FlowContentPipeline', 1);
+
+    request.onsuccess = async (event) => {
+      const db = event.target.result;
+
+      if (!db.objectStoreNames.contains('ideas')) {
+        throw new Error('Ideas store not found. Make sure Flow has been initialized.');
+      }
+
+      const transaction = db.transaction(['ideas'], 'readwrite');
+      const store = transaction.objectStore('ideas');
+
+      let imported = 0;
+      let failed = 0;
+
+      // Import each idea
+      for (const idea of importData.ideas) {
+        try {
+          const flowIdea = {
+            id: `evissa-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            pillarId: '',
+            gist: idea.title,
+            hooks: idea.hooks || [],
+            content: idea.coreIdea,
+            source: idea.source || { type: 'evissa', title: idea.title },
+            tags: idea.tags || [],
+            status: 'approved',
+            importedAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+
+          await new Promise((resolve, reject) => {
+            const addRequest = store.add(flowIdea);
+            addRequest.onsuccess = () => resolve();
+            addRequest.onerror = () => reject(addRequest.error);
+          });
+
+          imported++;
+          console.log(`✅ Imported: ${idea.title.substring(0, 50)}...`);
+        } catch (error) {
+          console.error(`❌ Failed to import: ${idea.title}`, error);
+          failed++;
+        }
+      }
+
+      console.log(`
+========================================
+✅ Import Complete!
+========================================
+Imported: ${imported} ideas
+Failed: ${failed} ideas
+
+⚠️  IMPORTANT: Refresh the page to see the imported ideas
+========================================
+      `);
+
+      // Auto-refresh after 2 seconds
+      setTimeout(() => {
+        console.log('Refreshing page...');
+        window.location.reload();
+      }, 2000);
+    };
+
+    request.onerror = () => {
+      console.error('Failed to open database:', request.error);
+    };
+
+  } catch (error) {
+    console.error('Import failed:', error);
+  }
+}
+
+// Note: The actual idea data will be appended below by the generation script
+
+// Run the import
+importEvissaIdeas();

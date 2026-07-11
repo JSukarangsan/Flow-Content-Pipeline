@@ -1,0 +1,7 @@
+{
+  "inbox_path": "./flow-data/inbox",
+  "processed_path": "./flow-data/processed",
+  "errors_path": "./flow-data/errors",
+  "watch_enabled": true,
+  "watch_interval_ms": 5000
+}

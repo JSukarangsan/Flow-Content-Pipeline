@@ -10,6 +10,7 @@ interface PillarCardProps {
 export const PillarCard: React.FC<PillarCardProps> = ({ pillar, isActive, onClick }) => {
   return (
     <div
+      id={`pillar-${pillar.id}`}
       onClick={onClick}
       className={`
         group relative p-4 border-b border-gray-800 cursor-pointer transition-colors duration-150
@@ -17,24 +18,24 @@ export const PillarCard: React.FC<PillarCardProps> = ({ pillar, isActive, onClic
       `}
     >
       <div className="flex justify-between items-start mb-1">
-        <span className="text-[10px] uppercase tracking-wider font-mono text-gray-500">{pillar.topic}</span>
-        {isActive && <span className="w-1.5 h-1.5 rounded-full bg-accent-500" />}
+        {pillar.topic && <span className="text-[10px] uppercase tracking-wider font-mono text-gray-500">{pillar.topic}</span>}
+        {isActive && <span className="w-1.5 h-1.5 rounded-full bg-accent-500 shrink-0 ml-auto" />}
       </div>
       <h3 className={`font-medium text-sm mb-2 ${isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'}`}>
         {pillar.title}
       </h3>
+      <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed mb-2">
+        {pillar.coreIdea}
+      </p>
       {pillar.themes && pillar.themes.length > 0 && (
-        <div className="flex flex-wrap gap-1 mb-2">
+        <div className="flex flex-wrap gap-1">
           {pillar.themes.map(theme => (
-            <span key={theme} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            <span key={theme} className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 font-mono tracking-wide">
               {theme}
             </span>
           ))}
         </div>
       )}
-      <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
-        {pillar.coreIdea}
-      </p>
     </div>
   );
 };

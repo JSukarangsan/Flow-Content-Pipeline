@@ -1,0 +1,52 @@
+{
+  "generated_at": "2025-02-20T10:30:00Z",
+  "ideas": [
+    {
+      "id": "idea-001",
+      "pillar": "AI Strategy",
+      "gist": "AI tools should augment human creativity, not replace it",
+      "hooks": [
+        "The best AI implementations amplify what makes us uniquely human",
+        "Why the most successful companies treat AI as a collaborator, not a replacement"
+      ],
+      "source": {
+        "type": "notion",
+        "url": "https://notion.so/ai-strategy-doc",
+        "title": "AI Strategy Framework"
+      },
+      "content": "In the rush to implement AI, many companies are missing the point. The goal isn't to replace human workers—it's to amplify human capabilities. The most successful AI implementations I've seen focus on three key principles:\n\n1. Augmentation over automation: Use AI to handle repetitive tasks so humans can focus on creative and strategic work\n\n2. Human-in-the-loop design: Keep humans involved in decision-making, especially for high-stakes choices\n\n3. Continuous learning: Both the AI and the humans using it should be constantly improving\n\nCompanies that follow these principles see 3x better ROI on their AI investments compared to those pursuing full automation.",
+      "tags": ["ai", "strategy", "automation", "future-of-work"]
+    },
+    {
+      "id": "idea-002",
+      "pillar": "Content Velocity",
+      "gist": "Content multiplication is more effective than content creation",
+      "hooks": [
+        "Stop creating more content. Start multiplying what works.",
+        "How one piece of content can become 50 (without feeling repetitive)"
+      ],
+      "source": {
+        "type": "youtube",
+        "url": "https://youtube.com/watch?v=example",
+        "title": "Content Strategy Deep Dive"
+      },
+      "content": "Most content creators are stuck on a hamster wheel—constantly creating new content that gets buried in the feed within hours. There's a better way: content multiplication.\n\nHere's the framework:\n\n1. Create one pillar piece (deep, valuable content)\n2. Extract 5-7 key insights\n3. Turn each insight into platform-specific content\n4. Create variations for different audiences\n5. Repurpose across time zones and contexts\n\nOne 2,000-word article becomes:\n- 10 LinkedIn posts\n- 5 Twitter threads\n- 3 newsletter sections\n- 15 Instagram carousels\n- 2 YouTube scripts\n\nThe key? Each piece feels native to its platform, not copy-pasted.",
+      "tags": ["content", "marketing", "strategy", "social-media"]
+    },
+    {
+      "id": "idea-003",
+      "pillar": "Contrarian Takes",
+      "gist": "The best time to post on social media is when your competitors aren't",
+      "hooks": [
+        "Everyone's wrong about the 'best time to post'",
+        "Why posting at 3 AM might be your secret weapon"
+      ],
+      "source": {
+        "type": "manual",
+        "title": "Original Research"
+      },
+      "content": "Every social media guru will tell you the 'optimal posting times'—usually some variation of 9 AM or 5 PM on weekdays. They're all wrong.\n\nThe best time to post is when:\n1. Your specific audience is most receptive (not everyone's audience)\n2. Competition for attention is lowest\n3. The algorithm is hungry for content\n\nI tested posting at 'terrible' times for 90 days. Results:\n- 3 AM posts got 2.3x more engagement\n- Weekend posts outperformed weekdays by 40%\n- Holiday posts (when everyone else is offline) went viral 5x more often\n\nWhy? Less competition + algorithm boost for fresh content + global audience = winning formula.\n\nStop following generic advice. Test unconventional times.",
+      "tags": ["social-media", "contrarian", "marketing", "growth"]
+    }
+  ]
+}

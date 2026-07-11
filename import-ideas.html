@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Evissa Ideas to Flow</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            padding: 2rem;
+            background: #1a1a1a;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+        h1 {
+            margin-top: 0;
+            color: #fff;
+        }
+        .status {
+            padding: 1rem;
+            background: #222;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border: 1px solid #444;
+        }
+        .success {
+            border-color: #10b981;
+            background: #064e3b;
+        }
+        .error {
+            border-color: #ef4444;
+            background: #7f1d1d;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        button:disabled {
+            background: #4b5563;
+            cursor: not-allowed;
+        }
+        .idea-preview {
+            background: #222;
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+            border-left: 3px solid #3b82f6;
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Import Evissa Ideas to Flow</h1>
+
+        <div id="status" class="status">
+            <p>Ready to import 25 ideas from Evissa to Flow.</p>
+            <p>Make sure Flow is running at <a href="http://localhost:3000" target="_blank" style="color: #3b82f6">http://localhost:3000</a></p>
+        </div>
+
+        <div id="preview" style="display: none;">
+            <h3>Ideas to import:</h3>
+            <div id="idea-list"></div>
+        </div>
+
+        <button id="import-btn" onclick="startImport()">Start Import</button>
+        <button onclick="window.location.href='http://localhost:3000'" style="margin-left: 10px;">Open Flow</button>
+    </div>
+
+    <script>
+        let importData = null;
+
+        // Load the import data
+        async function loadData() {
+            try {
+                const response = await fetch('/scripts/import-data.json');
+                importData = await response.json();
+
+                // Show preview
+                const preview = document.getElementById('preview');
+                const ideaList = document.getElementById('idea-list');
+
+                preview.style.display = 'block';
+
+                // Show first 5 ideas
+                importData.ideas.slice(0, 5).forEach((idea, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'idea-preview';
+                    div.innerHTML = `<strong>${i + 1}.</strong> ${idea.title}`;
+                    ideaList.appendChild(div);
+                });
+
+                if (importData.ideas.length > 5) {
+                    const div = document.createElement('div');
+                    div.className = 'idea-preview';
+                    div.innerHTML = `<em>... and ${importData.ideas.length - 5} more ideas</em>`;
+                    ideaList.appendChild(div);
+                }
+
+            } catch (error) {
+                document.getElementById('status').innerHTML =
+                    `<p style="color: #ef4444">Error loading import data: ${error.message}</p>`;
+                document.getElementById('import-btn').disabled = true;
+            }
+        }
+
+        // Import function that works directly with IndexedDB
+        async function startImport() {
+            const statusDiv = document.getElementById('status');
+            const importBtn = document.getElementById('import-btn');
+
+            importBtn.disabled = true;
+            statusDiv.innerHTML = '<p><span class="spinner"></span> Importing ideas...</p>';
+
+            try {
+                // Open IndexedDB
+                const request = indexedDB.open('FlowContentPipeline', 1);
+
+                request.onsuccess = async (event) => {
+                    const db = event.target.result;
+
+                    // Check if ideas store exists
+                    if (!db.objectStoreNames.contains('ideas')) {
+                        throw new Error('Flow database not initialized. Please open Flow first.');
+                    }
+
+                    const transaction = db.transaction(['ideas'], 'readwrite');
+                    const store = transaction.objectStore('ideas');
+
+                    let imported = 0;
+                    let failed = 0;
+
+                    // Import each idea
+                    for (const idea of importData.ideas) {
+                        try {
+                            const flowIdea = {
+                                id: `evissa-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                                pillarId: '', // Ideas don't belong to pillars in the new model
+                                gist: idea.title,
+                                hooks: idea.hooks || [],
+                                content: idea.coreIdea,
+                                source: idea.source || { type: 'evissa', title: idea.title },
+                                tags: idea.tags || [],
+                                status: 'approved',
+                                importedAt: new Date().toISOString(),
+                                updatedAt: new Date().toISOString()
+                            };
+
+                            await new Promise((resolve, reject) => {
+                                const addRequest = store.add(flowIdea);
+                                addRequest.onsuccess = () => resolve();
+                                addRequest.onerror = () => reject(addRequest.error);
+                            });
+
+                            imported++;
+                        } catch (error) {
+                            console.error(`Failed to import idea: ${idea.title}`, error);
+                            failed++;
+                        }
+                    }
+
+                    // Show results
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = `
+                        <p>✅ Import completed successfully!</p>
+                        <p>Imported: ${imported} ideas</p>
+                        ${failed > 0 ? `<p>Failed: ${failed} ideas</p>` : ''}
+                        <p style="margin-top: 1rem;">
+                            <strong>Refresh Flow to see the imported ideas</strong>
+                        </p>
+                    `;
+
+                    importBtn.textContent = 'Import Complete';
+
+                    // Auto-redirect to Flow after 3 seconds
+                    setTimeout(() => {
+                        window.location.href = 'http://localhost:3000';
+                    }, 3000);
+                };
+
+                request.onerror = () => {
+                    throw new Error('Failed to open Flow database');
+                };
+
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `<p>❌ Import failed: ${error.message}</p>`;
+                importBtn.disabled = false;
+            }
+        }
+
+        // Load data when page loads
+        window.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>

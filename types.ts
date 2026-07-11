@@ -5,8 +5,10 @@ export interface Pillar {
   title: string;
   coreIdea: string;
   topic: string;
-  status: 'active' | 'archived';
+  status: 'active' | 'archived' | 'backlog';
   themes?: string[]; // "Red threads" or cross-cutting themes
+  priority?: 'high' | 'medium' | 'low';
+  audience?: string[]; // e.g. ['product-leaders', 'designers']
 }
 
 export interface Execution {
@@ -19,7 +21,7 @@ export interface Execution {
 }
 
 export interface NavState {
-  column: 0 | 1 | 2; // 0: Pillars, 1: Executions, 2: Editor
+  column: 0 | 1; // 0: Ideas, 1: Editor panel
   editing: boolean; // If true, keyboard nav is disabled (for typing in editor)
 }
 
